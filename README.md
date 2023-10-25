@@ -11,3 +11,8 @@ https://northeastern.instructure.com/courses/156907/pages/do-setup-a-group-for-y
 Project Proposal Github
 
 https://northeastern.instructure.com/courses/156907/pages/read-description-of-the-project-proposal?module_item_id=9148337
+
+Lucidchart for Conceptual Design & Flowchart
+https://lucid.app/lucidchart/45ed5e25-7e6e-49ff-8088-751bdaa303d2/edit?viewport_loc=-620%2C-1127%2C2299%2C1073%2C0_0&invitationId=inv_7f04e2f2-e79f-452b-971f-0665a379619c
+
+
