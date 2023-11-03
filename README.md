@@ -9,7 +9,7 @@ https://northeastern.instructure.com/courses/156907/pages/project-deliverable
 Project Group Setup Details
 https://northeastern.instructure.com/courses/156907/pages/do-setup-a-group-for-your-project?module_item_id=9148332
 
-Project Proposal Github
+Project Proposal
 https://northeastern.instructure.com/courses/156907/pages/read-description-of-the-project-proposal?module_item_id=9148337
 
 Lucidchart for Conceptual Design & Flowchart
