@@ -55,7 +55,10 @@ CREATE TABLE accounts (
     ON UPDATE CASCADE ON DELETE SET NULL,
     
     -- Combination of id_at_institution and institution_name must be unique
-    CONSTRAINT unique_bank_details UNIQUE (id_at_institution, institution_name)
+    CONSTRAINT unique_bank_details UNIQUE (id_at_institution, institution_name),
+
+	-- Combination of user_id and account_nickname must be unique
+	CONSTRAINT unique_account_nickname UNIQUE (user_id, account_nickname)
     );
 
 CREATE TABLE investments (
