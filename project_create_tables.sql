@@ -132,4 +132,4 @@ INSERT INTO goals (goal_name, goal_amount, user_id) VALUES
 ("Pay off my loans", 0, 1),
 ("DEBT FREE", 0, 2),
 ("House paid off", 0, 4),
-("Reach $100k", 100000, 1);
+("Reach $100k", 100000, 1); 
