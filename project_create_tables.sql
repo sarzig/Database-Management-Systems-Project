@@ -4,7 +4,7 @@ USE jsFinance;
 
 CREATE TABLE families (
 	family_id INT AUTO_INCREMENT PRIMARY KEY,
-    family_name VARCHAR (100)
+    family_name VARCHAR (100) NOT NULL
 );
 
 CREATE TABLE users (
