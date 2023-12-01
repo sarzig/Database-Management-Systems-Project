@@ -98,22 +98,22 @@ CREATE TABLE holdings (
 
 -- CREATE USERS
 USE jsfinance;
-INSERT INTO users (email, first_name, last_name) VALUES
-("sarah@gmail.com", "Sarah", "Witzig"),
-("ronak@gmail.com", "Ronak", "Padukone"),
-("joanne@yahoo.com", "Joanne", "Witzig"),
-("phrog_pilot@msn.com", "Bill", "Witzig"),
-("matthew@gmail.com", "Matthew", "Witzig"),
-("nancylane@aol.com", "Nancy", "Lane"),
-("rlane@aol.com", "Ray", "Lane"),
-("Vijayananda@gmail.com", "Vijay", "Padukone"),
-("Anita@gmail.com", "Anita", "Padukone");
-
 INSERT INTO families (family_name) VALUES
 ("Witzig Padukone Household"),
 ("The Witzigs"),
 ("Lane family"),
 ("The Padukones");
+
+INSERT INTO users (email, first_name, last_name, family_id) VALUES
+("sarah@gmail.com", "Sarah", "Witzig", 1),
+("ronak@gmail.com", "Ronak", "Padukone", 1),
+("joanne@yahoo.com", "Joanne", "Witzig", 2),
+("phrog_pilot@msn.com", "Bill", "Witzig", 2),
+("matthew@gmail.com", "Matthew", "Witzig", NULL),
+("nancylane@aol.com", "Nancy", "Lane", 3),
+("rlane@aol.com", "Ray", "Lane", 3),
+("Vijayananda@gmail.com", "Vijay", "Padukone", 4),
+("Anita@gmail.com", "Anita", "Padukone", 4);
 
 INSERT INTO accounts (id_at_institution, institution_name, account_nickname, account_type, user_id) VALUES
 ("20505157", "TD Bank", "My brokerage", "Taxable Brokerage", 1),
@@ -137,3 +137,4 @@ INSERT INTO goals (goal_name, goal_amount, user_id) VALUES
 ("DEBT FREE", 0, 2),
 ("House paid off", 0, 4),
 ("Reach $100k", 100000, 1); 
+
