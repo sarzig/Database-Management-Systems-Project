@@ -36,19 +36,18 @@ BEGIN
     END IF;
 
     -- Check if the account with the same id_at_institution and institution_name already exists
-	SELECT COUNT(*) > 0 INTO id_and_instution_combo_already_exists
-	FROM accounts
-	WHERE id_at_institution = id_at_institution_p
-	AND institution_name = institution_name_p;
+	SELECT COUNT(*) > 0 INTO id_and_instution_combo_already_exists 
+    FROM accounts
+	WHERE id_at_institution = id_at_institution_p AND institution_name = institution_name_p;
     
-	IF id_and_instution_combo_already_exists THEN
+    IF id_and_instution_combo_already_exists THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "Combination of ID at institution and institution name already exists.";
     END IF;
     
     -- Check that a goal by that name exists with the current user
-    SELECT COUNT(*) = 0 INTO goal_does_not_exist
+	SELECT COUNT(*) = 0 INTO goal_does_not_exist 
     FROM goals
-    WHERE goal_name = goal_name_p AND user_id = user_id_p;
+	WHERE goal_name = goal_name_p AND user_id = user_id_p;
     
     -- if goal name is NULL, then goal_id is NULL and there's no error
     IF goal_name_p IS NULL THEN
@@ -71,7 +70,12 @@ BEGIN
 END $$
 DELIMITER ;
 
+
+-- testing, delete later _____________________________________________________________________________________
+SELECT * FROM goals WHERE user_id = 1;
 -- if this is the first call, it should work
 CALL create_account("mera id", "Chase Bank", "My Chase checking", "checkings", 1, NULL);
 -- if this is the second call, it should fail
-CALL create_account
+CALL create_account("01234", "Ally Bank", "emergency saving", "savings", 1, "Reach $100k");
+
+SELECT * FROM accounts WHERE user_id = 1;
