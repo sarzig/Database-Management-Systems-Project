@@ -63,3 +63,27 @@ CALL update_user_family(1, 5000);
 
 -- should fail because user_id doesn't exist
 CALL update_user_family(5000, NULL);
+
+
+-- optional more targeted procedure ------------------------------------------------------------------------------
+
+-- To remove a user from a family, the user_id is needed. This procedure
+-- requires an existing user_id and for that user to already be associated
+-- with a family.
+
+DELIMITER $$
+CREATE PROCEDURE update_user_family_to_null(
+    IN user_id_p INT
+)
+BEGIN
+    CALL update_user_family(user_id_p, NULL);
+END $$
+DELIMITER ;
+
+-- testing ---------------------------------------------------------------------------------------------------------
+SELECT * FROM jsfinance.users;
+SELECT * FROM jsfinance.goals;
+
+-- should pass first time
+CALL update_user_family_to_null(1);
+-- should fail second time (family already NULL)
