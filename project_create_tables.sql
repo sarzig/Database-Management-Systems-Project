@@ -78,6 +78,10 @@ CREATE TABLE transactions (
     account_reference_id INT,
 	CONSTRAINT fk_account_reference_id_transactions FOREIGN KEY (account_reference_id) REFERENCES accounts(account_reference_id) 
     ON UPDATE CASCADE ON DELETE RESTRICT
+
+    daily_value DECIMAL(13, 2),
+    CONSTRAINT fk_daily_value_transactions FOREIGN KEY (daily_value) REFERENCES investments(daily_value)
+    ON UPDATE RESTRICT ON DELETE RESTRICT
 );
 
 CREATE TABLE holdings (
