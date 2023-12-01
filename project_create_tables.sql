@@ -8,11 +8,11 @@ CREATE TABLE families (
 );
 
 CREATE TABLE users (
-	user_id INT AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(200) UNIQUE,
-    first_name VARCHAR(100), 
+   user_id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(200) UNIQUE NOT NULL,
+    first_name VARCHAR(100) NOT NULL, 
     last_name VARCHAR(100),
-	family_id INT DEFAULT NULL,
+    family_id INT DEFAULT NULL,
 	
     -- If user's family changes, then update the details.
     -- If user's family is deleted, then set user's family to NULL.
