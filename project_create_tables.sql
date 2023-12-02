@@ -87,6 +87,7 @@ CREATE TABLE transactions (
 
 CREATE TABLE holdings (
 	holdings_id INT AUTO_INCREMENT PRIMARY KEY,
+	number_shares FLOAT,
     
     symbol VARCHAR(10),
 	CONSTRAINT fk_symbol_holdings FOREIGN KEY (symbol) REFERENCES investments(symbol) 
