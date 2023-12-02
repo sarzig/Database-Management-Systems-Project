@@ -82,6 +82,8 @@ CREATE TABLE transactions (
 	CONSTRAINT fk_account_reference_id_transactions FOREIGN KEY (account_reference_id) REFERENCES accounts(account_reference_id) 
     ON UPDATE CASCADE ON DELETE RESTRICT,
 
+    value_transacted_at DECIMAL(13, 2),
+
     CONSTRAINT transactions_shares_cant_be_negative CHECK (number_shares > 0)
 );
 
