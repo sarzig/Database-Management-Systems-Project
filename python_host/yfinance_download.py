@@ -44,3 +44,5 @@ for symbol in symbols:
 
 # Print first 5 rows of the data
 print(tabulate.tabulate(sp_100))
+
+print(sp_100)
