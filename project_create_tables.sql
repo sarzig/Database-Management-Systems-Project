@@ -80,7 +80,9 @@ CREATE TABLE transactions (
     
     account_reference_id INT,
 	CONSTRAINT fk_account_reference_id_transactions FOREIGN KEY (account_reference_id) REFERENCES accounts(account_reference_id) 
-    ON UPDATE CASCADE ON DELETE RESTRICT
+    ON UPDATE CASCADE ON DELETE RESTRICT,
+
+    CONSTRAINT transactions_shares_cant_be_negative CHECK (number_shares > 0)
 );
 
 CREATE TABLE holdings (
@@ -93,7 +95,9 @@ CREATE TABLE holdings (
     
     account_reference_id INT,
 	CONSTRAINT fk_account_reference_id_holdings FOREIGN KEY (account_reference_id) REFERENCES accounts(account_reference_id) 
-    ON UPDATE CASCADE ON DELETE RESTRICT    
+    ON UPDATE CASCADE ON DELETE RESTRICT,
+
+    CONSTRAINT holdings_shares_cant_be_negative CHECK (number_shares > 0)
 );
 
 -- CREATE USERS
