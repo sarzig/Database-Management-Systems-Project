@@ -40,7 +40,7 @@ CREATE TABLE accounts (
     id_at_institution VARCHAR(50),
     institution_name VARCHAR(200), 
     account_nickname VARCHAR(50),
-    account_type ENUM("loan", "checkings", "savings", "401(k)", "roth IRA", "traditional IRA", "529", "taxable brokerage", "cryptocurrency"),
+    account_type ENUM("loan", "checkings", "savings", "401(k)", "roth IRA", "traditional IRA", "529", "taxable brokerage"),
 	user_id INT,
     goal_id INT DEFAULT NULL,
     
@@ -125,7 +125,6 @@ INSERT INTO accounts (id_at_institution, institution_name, account_nickname, acc
 ("66074247", "Vanguard", "Vanguard 401k", "401(k)", 1),
 ("72395085", "Vanguard", "Vanguard Roth", "roth IRA", 1),
 ("31150065", "Vanguard", "Vanguard Trad. IRA", "traditional IRA", 1),
-("98178077-01", "Robinhood", "CRYPTO", "cryptocurrency", 1),
 ("66839606", "Vanguard", "Vanguard 529", "529", 1),
 ("59346393", "Nelnet", "First Loan", "loan", 1),
 ("17974534", "Nelnet", "Second Loan", "loan", 1),
