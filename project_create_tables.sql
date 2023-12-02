@@ -160,7 +160,7 @@ VALUES
 
 SELECT * FROM accounts;
 
-INSERT INTO holdings (account_reference_id, symbol, shares)
+INSERT INTO holdings (account_reference_id, symbol, number_shares)
 VALUES
 (1, "CASH", 1000),
 (1, "TSLA", 2), 
