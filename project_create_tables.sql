@@ -64,7 +64,6 @@ CREATE TABLE accounts (
 CREATE TABLE investments (
 	symbol VARCHAR(10) PRIMARY KEY,
     company_name VARCHAR(200),
-    industry ENUM("oil and gas", "yyy", "add industries here plz"),
     daily_value DECIMAL(13, 2)
 );
 
@@ -146,18 +145,18 @@ INSERT INTO goals (goal_name, goal_amount, user_id) VALUES
 
 INSERT INTO investments (symbol, company_name, industry, daily_value)
 VALUES
-("CASH", "Cash", "yyy", 1),
-("DEBT", "Debt", "yyy", 1),
-('AAPL', 'Apple Inc.', 'yyy', 150.25),
-('MSFT', 'Microsoft Corporation', 'yyy', 310.75),
-('GOOGL', 'Alphabet Inc.', 'yyy', 2700.50),
-('AMZN', 'Amazon.com Inc.', 'yyy', 3450.00),
-('FB', 'Meta Platforms, Inc.', 'yyy', 325.50),
-('TSLA', 'Tesla, Inc.', 'yyy', 800.60),
-('JPM', 'JPMorgan Chase & Co.', 'yyy', 155.20),
-('GS', 'The Goldman Sachs Group, Inc.', 'yyy', 380.40),
-('WMT', 'Walmart Inc.', 'yyy', 140.80),
-('PG', 'Procter & Gamble Co.', 'yyy', 135.90);
+("CASH", "Cash", 1),
+("DEBT", "Debt", 1),
+('AAPL', 'Apple Inc.', 150.25),
+('MSFT', 'Microsoft Corporation', 310.75),
+('GOOGL', 'Alphabet Inc.', 2700.50),
+('AMZN', 'Amazon.com Inc.', 3450.00),
+('FB', 'Meta Platforms, Inc.', 325.50),
+('TSLA', 'Tesla, Inc.', 800.60),
+('JPM', 'JPMorgan Chase & Co.', 155.20),
+('GS', 'The Goldman Sachs Group, Inc.', 380.40),
+('WMT', 'Walmart Inc.', 140.80),
+('PG', 'Procter & Gamble Co.', 135.90);
 
 SELECT * FROM accounts;
 
