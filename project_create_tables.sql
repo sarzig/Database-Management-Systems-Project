@@ -80,7 +80,9 @@ CREATE TABLE transactions (
     
     account_reference_id INT,
 	CONSTRAINT fk_account_reference_id_transactions FOREIGN KEY (account_reference_id) REFERENCES accounts(account_reference_id) 
-    ON UPDATE CASCADE ON DELETE RESTRICT
+    ON UPDATE CASCADE ON DELETE RESTRICT,
+    
+    value_transacted_at DECIMAL(13, 2)
 );
 
 CREATE TABLE holdings (
