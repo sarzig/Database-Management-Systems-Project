@@ -67,7 +67,6 @@ CREATE TABLE investments (
     daily_value DECIMAL(13, 2)
 );
 
--- yyy should we also have amount? or or that redundant?
 CREATE TABLE transactions (
 	transaction_id INT AUTO_INCREMENT PRIMARY KEY,
     transaction_date DATE,
@@ -120,27 +119,29 @@ INSERT INTO users (email, first_name, last_name, family_id) VALUES
 ("Vijayananda@gmail.com", "Vijay", "Padukone", 4),
 ("Anita@gmail.com", "Anita", "Padukone", 4);
 
-INSERT INTO accounts (id_at_institution, institution_name, account_nickname, account_type, user_id) VALUES
-("20505157", "TD Bank", "My brokerage", "Taxable Brokerage", 1),
-("66074247", "Vanguard", "Vanguard 401k", "401(k)", 1),
-("72395085", "Vanguard", "Vanguard Roth", "roth IRA", 1),
-("31150065", "Vanguard", "Vanguard Trad. IRA", "traditional IRA", 1),
-("66839606", "Vanguard", "Vanguard 529", "529", 1),
-("59346393", "Nelnet", "First Loan", "loan", 1),
-("17974534", "Nelnet", "Second Loan", "loan", 1),
-("29476087", "Bank of America", "Ronak's Checking", "checkings", 2),
-("82441179", "Ally", "Ronak's Saving", "savings", 2),
-("54319892", "Nelnet", "Nelnet Loan", "loan", 2),
-("08303869", "Northeastern", "Northeastern Loan", "loan", 2),
-("35425018", "SLM Corporation", "Sallie Mae", "loan", 2),
-("17261416", "FMC Corporation", "Freddie Mac", "loan", 2),
-("40639267", "Chase", "Ronak's 401(k)", "401(k)", 2);
-
 INSERT INTO goals (goal_name, goal_amount, user_id) VALUES
 ("Pay off my loans", 0, 1),
 ("DEBT FREE", 0, 2),
 ("House paid off", 0, 4),
 ("Reach $100k", 100000, 1); 
+
+INSERT INTO accounts (id_at_institution, institution_name, account_nickname, account_type, user_id, goal_id) VALUES
+("20505157", "TD Bank", "My brokerage", "Taxable Brokerage", 1, 4),
+("66074247", "Vanguard", "Vanguard 401k", "401(k)", 1, 4),
+("72395085", "Vanguard", "Vanguard Roth", "roth IRA", 1, 4),
+("31150065", "Vanguard", "Vanguard Trad. IRA", "traditional IRA", 1, 4),
+("66839606", "Vanguard", "Vanguard 529", "529", 1, 4),
+("59346393", "Nelnet", "First Loan", "loan", 1, 1),
+("17974534", "Nelnet", "Second Loan", "loan", 1, 1),
+("29476087", "Bank of America", "Ronak's Checking", "checkings", 2, NULL),
+("82441179", "Ally", "Ronak's Saving", "savings", 2, 2),
+("54319892", "Nelnet", "Nelnet Loan", "loan", 2, 2),
+("08303869", "Northeastern", "Northeastern Loan", "loan", 2, 2),
+("35425018", "SLM Corporation", "Sallie Mae", "loan", 2, 2),
+("17261416", "FMC Corporation", "Freddie Mac", "loan", 2, 2),
+("40639267", "Chase", "Ronak's 401(k)", "401(k)", 2, NULL);
+
+
 
 INSERT INTO investments (symbol, company_name, daily_value)
 VALUES
@@ -184,3 +185,6 @@ VALUES
 (14, 'GS', 380.40),
 (14, 'WMT', 140.80),
 (14, 'PG', 135.90);
+
+-- INSERT INTO transactions(transaction_date, number_shares, symbol, account_reference_id, value_transacted_at) VALUES
+-- ("2022-
