@@ -80,14 +80,12 @@ CREATE TABLE transactions (
     
     account_reference_id INT,
 	CONSTRAINT fk_account_reference_id_transactions FOREIGN KEY (account_reference_id) REFERENCES accounts(account_reference_id) 
-    ON UPDATE CASCADE ON DELETE RESTRICT,
-    
-    value_transacted_at DECIMAL(13, 2)
+    ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
 CREATE TABLE holdings (
 	holdings_id INT AUTO_INCREMENT PRIMARY KEY,
-	number_shares FLOAT,
+    number_shares FLOAT,
     
     symbol VARCHAR(10),
 	CONSTRAINT fk_symbol_holdings FOREIGN KEY (symbol) REFERENCES investments(symbol) 
@@ -140,3 +138,45 @@ INSERT INTO goals (goal_name, goal_amount, user_id) VALUES
 ("House paid off", 0, 4),
 ("Reach $100k", 100000, 1); 
 
+INSERT INTO investments (symbol, company_name, industry, daily_value)
+VALUES
+("CASH", "Cash", "yyy", 1),
+("DEBT", "Debt", "yyy", 1),
+('AAPL', 'Apple Inc.', 'yyy', 150.25),
+('MSFT', 'Microsoft Corporation', 'yyy', 310.75),
+('GOOGL', 'Alphabet Inc.', 'yyy', 2700.50),
+('AMZN', 'Amazon.com Inc.', 'yyy', 3450.00),
+('FB', 'Meta Platforms, Inc.', 'yyy', 325.50),
+('TSLA', 'Tesla, Inc.', 'yyy', 800.60),
+('JPM', 'JPMorgan Chase & Co.', 'yyy', 155.20),
+('GS', 'The Goldman Sachs Group, Inc.', 'yyy', 380.40),
+('WMT', 'Walmart Inc.', 'yyy', 140.80),
+('PG', 'Procter & Gamble Co.', 'yyy', 135.90);
+
+SELECT * FROM accounts;
+
+INSERT INTO holdings (account_reference_id, symbol, shares)
+VALUES
+(1, "CASH", 1000),
+(1, "TSLA", 2), 
+(1, "PG", 32),
+(2, "WMT", 100), 
+(2, "GS", 2),
+(7, "DEBT", 9000.58),
+(8, "DEBT", 3000),
+(9, "CASH", 14032),
+(10, "CASH", 200),
+(11, "DEBT", 31), 
+(12, "DEBT", 1999),
+(13, "DEBT", 1000), 
+(14, "DEBT", 300),
+(15, 'AAPL', 150.25),
+(15, 'MSFT', 310.75),
+(15, 'GOOGL', 2700.50),
+(15, 'AMZN', 3450.00),
+(15, 'FB', 325.50),
+(15, 'TSLA', 800.60),
+(15, 'JPM', 155.20),
+(15, 'GS', 380.40),
+(15, 'WMT', 140.80),
+(15, 'PG', 135.90);
