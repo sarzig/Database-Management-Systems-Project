@@ -41,16 +41,16 @@ CREATE TABLE accounts (
     institution_name VARCHAR(200), 
     account_nickname VARCHAR(50),
     account_type ENUM("loan", "checkings", "savings", "401(k)", "roth IRA", "traditional IRA", "529", "taxable brokerage", "cryptocurrency"),
+	user_id INT,
+    goal_id INT DEFAULT NULL,
     
     -- If user_id changes, restrict the change.
     -- If user_id is deleted from database, then the user's accounts are also deleted (yyy: is this bad?
-    user_id INT,
     CONSTRAINT fk_user_id_accounts FOREIGN KEY (user_id) REFERENCES users(user_id)
     ON UPDATE RESTRICT ON DELETE CASCADE,
     
     -- If goal_id changes, then cascade it.
-    -- If goal is deleted, then set null- account is no longer linked to that goal.
-    goal_id INT,
+    -- If goal is deleted, then set null - account is no longer linked to that goal.
     CONSTRAINT fk_goal_id_accounts FOREIGN KEY (goal_id) REFERENCES goals(goal_id) 
     ON UPDATE CASCADE ON DELETE SET NULL,
     
