@@ -1,3 +1,9 @@
+-- TODO - this needs to add or subtract from holdings. Logic:
+-- if account already has holding named symbol, then update holdings = holdings + number_shares * daily value
+-- if account does not have holding named symbol, then:
+-- INSERT into holdings(number_shares, symbol, account_reference_id) VALUES
+-- (number_shares_p, symbol_p, account_reference_id_p)
+
 -- procedure for creating transaction
 
 DELIMITER $$
