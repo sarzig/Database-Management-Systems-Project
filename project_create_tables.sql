@@ -143,7 +143,7 @@ INSERT INTO goals (goal_name, goal_amount, user_id) VALUES
 ("House paid off", 0, 4),
 ("Reach $100k", 100000, 1); 
 
-INSERT INTO investments (symbol, company_name, industry, daily_value)
+INSERT INTO investments (symbol, company_name, daily_value)
 VALUES
 ("CASH", "Cash", 1),
 ("DEBT", "Debt", 1),
