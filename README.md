@@ -15,4 +15,18 @@ https://northeastern.instructure.com/courses/156907/pages/read-description-of-th
 Lucidchart for Conceptual Design & Flowchart
 https://lucid.app/lucidchart/45ed5e25-7e6e-49ff-8088-751bdaa303d2/edit?viewport_loc=-620%2C-1127%2C2299%2C1073%2C0_0&invitationId=inv_7f04e2f2-e79f-452b-971f-0665a379619c
 
+To do list
+Joseph - finish view family goals
+Sarah and Joseph - get connection working
+Sarah and Joseph - error check functions we each worked on
+Sarah and Joseph - identify problem areas or to-do
+Sarah report - lessons learned
+Sarah report - update UML
+JOseph report - user flow
+Joseph report - future work
+Sarah report - create sections as placeholders
 
+
+Sunday goals
+-get all functions and procedures which have been tested into a single file (or a couple)
+- 
