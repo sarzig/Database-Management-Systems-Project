@@ -144,7 +144,7 @@ INSERT INTO accounts (id_at_institution, institution_name, account_nickname, acc
 INSERT INTO investments (symbol, company_name, daily_value)
 VALUES
 ("CASH", "Cash", 1),
-("DEBT", "Debt", 1),
+("DEBT", "Debt", -1),
 ('AAPL', 'Apple Inc.', 150.25),
 ('MSFT', 'Microsoft Corporation', 310.75),
 ('GOOGL', 'Alphabet Inc.', 2700.50),
@@ -158,6 +158,7 @@ VALUES
 
 SELECT * FROM accounts;
 
+SELECT * FROM holdings;
 INSERT INTO holdings (account_reference_id, symbol, number_shares)
 VALUES
 (1, "CASH", 1000),
