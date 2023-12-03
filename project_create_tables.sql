@@ -187,4 +187,4 @@ VALUES
 
 INSERT INTO transactions(transaction_date, number_shares, symbol, account_reference_id, value_transacted_at) VALUES
 ("2022-10-05", 2, "TSLA", 1, 200),
-("2022-10-06", 3, "PG", 1, -4);
+("2022-10-06", 3, "PG", 1, 4);

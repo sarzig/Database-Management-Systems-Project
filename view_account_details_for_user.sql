@@ -17,7 +17,7 @@ BEGIN
 	SELECT 
 		accounts.account_nickname AS "Account Name",
 		accounts.account_type AS "Account Type",
-		COALESCE(ROUND(SUM(number_shares * daily_value), 2), 0) AS "Account Value"
+		concat("$ ", format(COALESCE(ROUND(SUM(number_shares * daily_value), 2), 0), 2)) AS "Account Value"
 	FROM holdings 
 	LEFT JOIN investments ON holdings.symbol = investments.symbol 
 	RIGHT JOIN accounts ON holdings.account_reference_id = accounts.account_reference_id

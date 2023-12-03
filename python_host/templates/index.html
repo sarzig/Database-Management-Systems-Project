@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Buttons and Input</title>
+</head>
+<body>
+    <h1>Flask Buttons and Input</h1>
+
+    <form method="post" action="{{ url_for('process') }}">
+        <label for="input_text">Input Text:</label>
+        <input type="text" id="input_text" name="input_text" required>
+        <br>
+
+        <label for="button_value">Button Value:</label>
+        <button type="submit" name="button_value" value="Button 1">Button 1</button>
+        <button type="submit" name="button_value" value="Button 2">Button 2</button>
+        <br>
+
+        {% if result %}
+            <p>{{ result }}</p>
+        {% endif %}
+    </form>
+</body>
+</html>
