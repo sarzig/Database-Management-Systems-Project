@@ -80,9 +80,7 @@ CREATE TABLE transactions (
 	CONSTRAINT fk_account_reference_id_transactions FOREIGN KEY (account_reference_id) REFERENCES accounts(account_reference_id) 
     ON UPDATE CASCADE ON DELETE RESTRICT,
 
-    value_transacted_at DECIMAL(13, 2),
-
-    CONSTRAINT transactions_shares_cant_be_negative CHECK (number_shares > 0)
+    value_transacted_at DECIMAL(13, 2)
 );
 
 CREATE TABLE holdings (
@@ -97,7 +95,7 @@ CREATE TABLE holdings (
 	CONSTRAINT fk_account_reference_id_holdings FOREIGN KEY (account_reference_id) REFERENCES accounts(account_reference_id) 
     ON UPDATE CASCADE ON DELETE RESTRICT,
 
-    CONSTRAINT holdings_shares_cant_be_negative CHECK (number_shares > 0)
+    CONSTRAINT holdings_shares_cant_be_negative CHECK (number_shares >= 0)
 );
 
 -- CREATE USERS
@@ -186,5 +184,6 @@ VALUES
 (14, 'WMT', 140.80),
 (14, 'PG', 135.90);
 
--- INSERT INTO transactions(transaction_date, number_shares, symbol, account_reference_id, value_transacted_at) VALUES
--- ("2022-
+INSERT INTO transactions(transaction_date, number_shares, symbol, account_reference_id, value_transacted_at) VALUES
+("2022-10-05", 2, "TSLA", 1, 200),
+("2022-10-06", 3, "PG", 1, -4);

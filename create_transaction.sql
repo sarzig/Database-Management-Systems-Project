@@ -1,9 +1,3 @@
--- TODO - this needs to add or subtract from holdings. Logic:
--- if account already has holding named symbol, then update holdings = holdings + number_shares * daily value
--- if account does not have holding named symbol, then:
--- INSERT into holdings(number_shares, symbol, account_reference_id) VALUES
--- (number_shares_p, symbol_p, account_reference_id_p)
-
 -- procedure for creating transaction
 
 DELIMITER $$
@@ -23,8 +17,8 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Incorrect date format: please use YYYY-MM-DD.';
 
     -- if number_shares is negative or 0
-    ELSEIF number_shares_p <= 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Number of shares must be positive.';
+    -- ELSEIF number_shares_p <= 0 THEN
+    --     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Number of shares must be positive.';
 
     -- if transaction date or number of shares are null
     ELSEIF transaction_date_p IS NULL OR number_shares_p IS NULL THEN
@@ -48,6 +42,20 @@ BEGIN
     -- create the transaction
     INSERT INTO transactions(transaction_date, number_shares, symbol, account_reference_id, value_transacted_at)
     VALUES (transaction_date_var, number_shares_p, symbol_p, account_reference_id_p, daily_value_var);
+    
+    -- If there is already a holdings tuple with the given symbol in that account, update
+    IF EXISTS (SELECT * FROM holdings WHERE account_reference_id = account_reference_id_p AND symbol = symbol_p) THEN
+		UPDATE holdings SET number_shares = number_shares + number_shares_p WHERE account_reference_id = account_reference_id_p AND symbol = symbol_p;
+	-- if holdings tuple in that account DNE, create new tuple
+    ELSE
+		INSERT into holdings(number_shares, symbol, account_reference_id) VALUES
+        (number_shares_p, symbol_p, account_reference_id_p);
+    END IF;
 END $$
-
 DELIMITER ;
+
+-- testing ----------------------------------------------------------------------------------------------------
+SELECT * FROM holdings WHERE account_reference_id = 1;
+SELECT * FROM transactions;
+CALL create_transaction("2023-12-02", 1, "AMZN", 1); -- this should work - a new tuple needs to be made in the holdings table
+CALL create_transaction("2023-12-02", -2, "CASH", 1); -- this should work - holdings tuple just gets updated

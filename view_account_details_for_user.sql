@@ -17,10 +17,10 @@ BEGIN
 	SELECT 
 		accounts.account_nickname AS "Account Name",
 		accounts.account_type AS "Account Type",
-		ROUND(SUM(number_shares * daily_value), 2) AS "Account Value"
+		COALESCE(ROUND(SUM(number_shares * daily_value), 2), 0) AS "Account Value"
 	FROM holdings 
-	JOIN investments ON holdings.symbol = investments.symbol 
-	JOIN accounts ON holdings.account_reference_id = accounts.account_reference_id
+	LEFT JOIN investments ON holdings.symbol = investments.symbol 
+	RIGHT JOIN accounts ON holdings.account_reference_id = accounts.account_reference_id
 	WHERE accounts.user_id = user_id_p
 	GROUP BY 
 		accounts.account_nickname,
@@ -31,6 +31,7 @@ DELIMITER ;
 
 -- shoudl show sarah's account details
 CALL view_accounts_details_for_user(1);
+SELECT * FROM accounts WHERE user_id =1 ;
 
 -- should fail for user who doesn't exist
 CALL view_accounts_details_for_user(500);
