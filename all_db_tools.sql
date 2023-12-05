@@ -241,10 +241,13 @@ CREATE PROCEDURE create_investment(
     IN daily_value_p DECIMAL(13,2)
     )
 BEGIN
+	DECLARE symbol_already_exists BOOLEAN;
+    SELECT count(*) > 0 INTO symbol_already_exists FROM investments WHERE symbol = symbol_p;
+    
 	-- error handling
     -- if symbol or company name is null
-    IF symbol_p IS NULL OR company_name_p IS NULL OR daily_value_p THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Date and number of shares must not be null.';
+    IF symbol_p IS NULL OR company_name_p IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'symbol and company name cannot be null.';
 
     -- if CASH is set to a value other than 1
     ELSEIF symbol_p = "CASH" and daily_value_p != 1 THEN
@@ -260,9 +263,17 @@ BEGIN
     
     END IF;
 
-    -- create the investment
-    INSERT INTO investments(symbol, company_name, daily_value) 
-    VALUES (symbol_p, company_name_p, daily_value_p);
+
+	-- if investment already exists, update the company name and daily value
+    IF symbol_already_exists THEN
+		UPDATE investments SET company_name = company_name_p WHERE symbol = symbol_p;
+		UPDATE investments SET daily_value = daily_value_p WHERE symbol = symbol_p;
+	
+    -- otherwise, create the investment
+    ELSE
+		INSERT INTO investments(symbol, company_name, daily_value) 
+		VALUES (symbol_p, company_name_p, daily_value_p);
+	END IF;
 END $$
 DELIMITER ;
 
