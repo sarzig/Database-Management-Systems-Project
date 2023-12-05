@@ -3,6 +3,10 @@ from numbers import Number
 import pymysql
 import time
 import pandas as pd
+import yfinance as yf
+import pandas as pd
+import tabulate as tabulate
+import yfinance_download
 
 # Replace these values with your MySQL database credentials
 db_host = 'localhost'
@@ -41,6 +45,33 @@ def parameter_parser(parameter_list):
     # Return the joined string
     return ", ".join(parameter_list)
 
+a=get_yfinance(get_valid_date())
+
+def update_stocks(database, stock_data: pd.DataFrame):
+    with db.cursor() as cursor:
+        function_cursor = database.cursor()
+
+        # Create an empty list
+        # Iterate over each row in the dataFrame and create the investment
+        for rows in stock_data.itertuples():
+            # Create list for the current row
+            parameter_list = [rows.symbol, rows.name, rows.value]
+
+            # append the list to the final list
+
+            print(rows.value)
+
+            parameter_string = parameter_parser(parameter_list)
+            print(parameter_list)
+            print(parameter_string)
+
+            # Call the stored procedure
+            function_cursor.execute(f"CALL create_investment({parameter_string})")
+            result = function_cursor.fetchall()
+            print(result)
+        db.commit()
+update_stocks(db, a)
+
 # Example query
 try:
     with db.cursor() as cursor:
@@ -54,15 +85,11 @@ try:
         procedure_name = 'create_investment'
 
         # Call the stored procedure
-        cursor.execute("CALL create_goal('my goalie21', 100, 1)")
-        result = cursor.fetchall()
-        print(result)
-        cursor.execute("SELECT * FROM goals")
-        result = pd.DataFrame(cursor.fetchall())
         print(result)
         db.commit()
 
-
+        update_stocks(db)
 finally:
     # Close the connection
     db.close()
+

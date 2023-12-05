@@ -263,7 +263,6 @@ BEGIN
     
     END IF;
 
-
 	-- if investment already exists, update the company name and daily value
     IF symbol_already_exists THEN
 		UPDATE investments SET company_name = company_name_p WHERE symbol = symbol_p;
@@ -274,6 +273,7 @@ BEGIN
 		INSERT INTO investments(symbol, company_name, daily_value) 
 		VALUES (symbol_p, company_name_p, daily_value_p);
 	END IF;
+    
 END $$
 DELIMITER ;
 
