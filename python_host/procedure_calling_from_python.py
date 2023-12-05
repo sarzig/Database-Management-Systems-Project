@@ -54,12 +54,13 @@ try:
         procedure_name = 'create_investment'
 
         # Call the stored procedure
-        cursor.execute("CALL create_goal('my goalie', 100, 1)")
+        cursor.execute("CALL create_goal('my goalie21', 100, 1)")
         result = cursor.fetchall()
         print(result)
         cursor.execute("SELECT * FROM goals")
         result = pd.DataFrame(cursor.fetchall())
         print(result)
+        db.commit()
 
 
 finally:
