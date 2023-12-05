@@ -1,11 +1,62 @@
 """
-Note: this file is deprecated / for reference only
+Filename: helpers.py
+Purpose : This file contains helpers that support the "run_jsfinance.py" command line interface program, and helpers
+          that support the jsFinance.py class.
 """
 
-
+from numbers import Number
 import datetime
 import yfinance as yf
 import pandas as pd
+import pymysql
+
+
+def connect_to_sql_database(authentication_dict: dict):
+    """
+    Connects to jsfinance database using the username and password.
+    :param: dict authentication_dict: dictionary with keys host, user and password
+    :return: conn, object of type MySQLConnection if successful
+             Otherwise, returns None if connection was unsuccessful.
+    """
+
+    # establishing the connection
+    try:
+        conn = pymysql.connect(
+            host=authentication_dict["host"],
+            user=authentication_dict["user"],
+            password=authentication_dict["password"],
+            database="jsfinance",
+            cursorclass=pymysql.cursors.DictCursor)
+
+    except Exception as e:
+        # Handle error by returning None and printing message
+        print(f"Error connecting to database:\n{e}")
+        conn = None
+
+    return conn
+
+
+def parameter_parser(parameter_list):
+    """
+    Given a list of parameters of different data types, this returns a parsed
+    string with numeric values not in double quotes, and non-numeric values in double quotes.
+    parameter_parser(["text_input", 3.0, "hello", 200]) returns: "text_input", 3.0, "hello", 200
+    :param parameter_list: list of parameters of different data types
+    :return: formatted string for SQL procedure/function calling purposes
+    """
+
+    # Iterate through all list elements
+    for i in range(len(parameter_list)):
+        # If the parameter is a number, simply convert to a string
+        if isinstance(parameter_list[i], Number):
+            parameter_list[i] = f'{parameter_list[i]}'
+
+        # otherwise, surround with double quotes
+        else:
+            parameter_list[i] = f'"{parameter_list[i]}"'
+
+    # Return the joined string
+    return ", ".join(parameter_list)
 
 
 def get_valid_date() -> datetime.date:

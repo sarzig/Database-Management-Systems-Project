@@ -1,3 +1,7 @@
+"""
+Note: this file is deprecated / for reference only
+"""
+
 from numbers import Number
 
 import pymysql
