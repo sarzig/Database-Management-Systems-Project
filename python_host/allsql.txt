@@ -1,7 +1,7 @@
 DELIMITER $$
 CREATE PROCEDURE deposit_money(IN transaction_date_p VARCHAR(50), IN account_reference_id_p INT, IN amount_p FLOAT)
--- deposits money into an account
 BEGIN
+    -- deposits money into an account
 	-- Error Handling -------------------------------------------------------------------------------------------   
     -- Make sure account exists  
     IF (SELECT COUNT(*) FROM accounts WHERE account_reference_id = account_reference_id_p) = 0 THEN
@@ -16,8 +16,8 @@ DELIMITER ;
 
 DELIMITER $$
 CREATE PROCEDURE take_loan(IN transaction_date_p VARCHAR(50), IN account_reference_id_p INT, IN amount_p FLOAT)
--- creates debt within an account
 BEGIN
+    -- creates debt within an account
 	-- Error Handling -------------------------------------------------------------------------------------------   
     -- Make sure account exists  
     IF (SELECT COUNT(*) FROM accounts WHERE account_reference_id = account_reference_id_p) = 0 THEN
@@ -32,8 +32,9 @@ DELIMITER ;
 
 DELIMITER $$
 CREATE PROCEDURE buy_investment_shares(IN transaction_date_p VARCHAR(50), IN account_reference_id_p INT, IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
--- takes cash from the specified account and buys stock
 BEGIN
+    -- takes cash from the specified account and buys stock
+
 	DECLARE investment_daily_value FLOAT;
 	DECLARE investment_total_cost FLOAT;
     DECLARE enough_cash_in_account INT;
@@ -66,8 +67,8 @@ DELIMITER ;
 
 DELIMITER $$
 CREATE PROCEDURE sell_investment_shares(IN transaction_date_p VARCHAR(50), IN account_reference_id_p INT, IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
--- sells stock for CASH
 BEGIN
+-- sells stock for CASH
 	DECLARE investment_daily_value FLOAT;
 	DECLARE investment_total_cost FLOAT;
     DECLARE shares_in_account FLOAT;
@@ -107,12 +108,12 @@ CREATE PROCEDURE create_account(
     IN user_id_p INT,
     IN goal_name_p VARCHAR(50)
 )
+BEGIN
 -- To create an account, institution details are needed (id at institution, institution name).
 -- The account must be given a nickname UNIQUE to that user.
 -- The account type must be specified, and must be equal to one of the account_type enums.
 -- If a goal should be linked to the account, the goal_name must already be associated with
 -- that user.
-BEGIN
     DECLARE id_and_instution_combo_already_exists BOOLEAN;
 	DECLARE goal_does_not_exist BOOLEAN;
     DECLARE goal_id_p INT;
@@ -198,11 +199,11 @@ CREATE PROCEDURE create_goal(
     IN goal_amount_p INT,
     IN user_id_p INT
 )
+BEGIN
 -- To create a goal, a goal name, amount, and user_id are needed.
 -- Errors occur if a goal by that name already exists for the given user, or
 -- if the given user does not exist.
 -- Goal amounts can be positive, 0, or negative
-BEGIN
 	DECLARE goal_name_already_in_use BOOLEAN;
     DECLARE user_does_not_exist BOOLEAN;
     
@@ -263,9 +264,7 @@ BEGIN
     INSERT INTO investments(symbol, company_name, daily_value) 
     VALUES (symbol_p, company_name_p, daily_value_p);
 END $$
-
 DELIMITER ;
--- procedure for creating transaction
 
 DELIMITER $$
 CREATE PROCEDURE create_transaction(
@@ -327,8 +326,8 @@ CREATE PROCEDURE create_user(
     IN first_name_p VARCHAR(100),
     IN last_name_p VARCHAR(100),
     IN family_id_p INT)
--- procedure for creating user
 BEGIN
+-- procedure for creating user
 	-- error handling
     -- if email is already taken
 	IF EXISTS(SELECT * FROM users WHERE email = email_p) THEN
@@ -347,14 +346,11 @@ END $$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE delete_account(
-    IN account_nickname_p VARCHAR(1000),
-    IN user_id_p INT
-)
+CREATE PROCEDURE delete_account(IN account_nickname_p VARCHAR(1000), IN user_id_p INT)
+BEGIN
 -- An account can be deleted with its account nickname and the user_id.
 -- If the user_id does not exist and the account nickname does not exist for that user then
 -- an error occurs.
-BEGIN
     DECLARE user_id_does_not_exist BOOLEAN;
 	DECLARE account_nickname_does_not_exist BOOLEAN;
 
@@ -380,9 +376,9 @@ DELIMITER ;
 
 DELIMITER $$
 CREATE PROCEDURE delete_family(IN family_id_p INT)
+BEGIN
 -- To delete a family, a family_id is needed. If that family_id does not exist, then
 -- an error is raised.
-BEGIN
     DECLARE family_does_not_exist BOOLEAN;
     
 	-- Error Handling -------------------------------------------------------------------------------------------   
@@ -430,9 +426,9 @@ DELIMITER ;
 
 DELIMITER $$
 CREATE PROCEDURE delete_user(IN user_id_p INT)
+BEGIN
 -- To delete a user, a user_id is needed. If that user_id does not exist, then
 -- an error is raised.
-BEGIN
     DECLARE user_does_not_exist BOOLEAN;
     
 	-- Error Handling -------------------------------------------------------------------------------------------   
@@ -492,11 +488,11 @@ CREATE PROCEDURE update_goal_amount(
     IN user_id_p INT, 
     IN new_goal_amount_p INT
 )
+BEGIN
 -- To update a goal's amount, a goal name, amount, and a user_id are needed.
 -- Errors occur if a goal by the old name doesn't exist for the given user, or
 -- if the given user does not exist, or if a goal by that amount already
 -- exists for the given user.
-BEGIN
 	DECLARE goal_name_does_not_exist BOOLEAN;
     DECLARE user_does_not_exist BOOLEAN;
     DECLARE amount_is_same BOOLEAN;
@@ -534,11 +530,11 @@ CREATE PROCEDURE update_goal_name(
     IN new_goal_name_p VARCHAR(1000),
     IN user_id_p INT
 )
+BEGIN
 -- To update a goal's name, an old and new goal name and a user_id are needed.
 -- Errors occur if a goal by the old name doesn't exist for the given user, or
 -- if the given user does not exist, or if a goal by the new name already
 -- exists for the given user.
-BEGIN
 	DECLARE old_goal_name_does_not_exist BOOLEAN;
     DECLARE user_does_not_exist BOOLEAN;
     DECLARE new_goal_name_already_exists BOOLEAN;
@@ -608,9 +604,9 @@ DELIMITER ;
 DELIMITER $$
 CREATE PROCEDURE update_user_family(IN user_id_p INT, IN family_id_p INT
 )
+BEGIN
 -- To update a user's family, the user_id and family_id must already exist.
 -- If the family_id_p is the same as the existing family_id, an error occurs.
-BEGIN
     DECLARE user_does_not_exist BOOLEAN;
     DECLARE original_family_id_is_null BOOLEAN;
     DECLARE family_id_already_the_same BOOLEAN;
@@ -651,18 +647,18 @@ DELIMITER ;
 
 DELIMITER $$
 CREATE PROCEDURE update_user_family_to_null(IN user_id_p INT)
+BEGIN
 -- To remove a user from a family, the user_id is needed. This procedure
 -- requires an existing user_id and for that user to already be associated
 -- with a family.
-BEGIN
     CALL update_user_family(user_id_p, NULL);
 END $$
 DELIMITER ;
 
 DELIMITER $$
 CREATE PROCEDURE view_accounts_details_for_family(IN family_id_p INT)
--- Given a family id, show account details table
 BEGIN
+-- Given a family id, show account details table
     DECLARE family_does_not_exist BOOLEAN;
 
 	-- Error Handling ----------------------------------------------------------------------------------------- 
@@ -692,8 +688,8 @@ DELIMITER ;
 
 DELIMITER $$
 CREATE PROCEDURE view_accounts_details_for_family_by_type(IN family_id_p INT)
--- Given a family id, show account details grouped into Assets, Debt, and calculate Net Worth
 BEGIN
+-- Given a family id, show account details grouped into Assets, Debt, and calculate Net Worth
     DECLARE family_does_not_exist BOOLEAN;
 
 	-- Error Handling ----------------------------------------------------------------------------------------- 
@@ -725,8 +721,8 @@ DELIMITER ;
 
 DELIMITER $$
 CREATE PROCEDURE view_accounts_details_for_user(IN user_id_p INT)
--- Given a user id, show account details table
 BEGIN
+-- Given a user id, show account details table
     DECLARE user_does_not_exist BOOLEAN;
 
 	-- Error Handling -------------------------------------------------------------------------------------------   
@@ -755,8 +751,8 @@ DELIMITER ;
 
 DELIMITER $$
 CREATE PROCEDURE view_user_transactions(IN user_id_p INT)
--- Given a user id, show 20 most recent transactions
 BEGIN
+-- Given a user id, show 20 most recent transactions
     DECLARE user_does_not_exist BOOLEAN;
 
 	-- Error Handling -------------------------------------------------------------------------------------------   
