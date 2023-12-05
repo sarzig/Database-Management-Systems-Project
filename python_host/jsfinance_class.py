@@ -1,5 +1,7 @@
 import pymysql
 
+# Section: static methods
+
 
 def connect_to_sql_database(host:str, username: str, password: str):
     """
@@ -72,21 +74,34 @@ class jsFinance:
         self.welcome_message()
         self.connection = connect_via_command_line_input()
         self.cursor = self.connection.cursor()
-        self.user = None
+        self.user = "jsFinance Admin"
         self.status = None
 
     @staticmethod
     def welcome_message():
         # Inform user they've entered the program
-        print("+----------------------------------------------------------+")
-        print("|                jsFinance Personal Finance Tracker        |")
-        print("+----------------------------------------------------------+")
+        print("+----------------------------------------------------------------------------------------------------+")
+        print("|                                 jsFinance Personal Finance Tracker                                 |")
+        print("+----------------------------------------------------------------------------------------------------+")
 
     def run(self):
+        """
+        This method runs the command line interface until an error occurs, or until the user quits.
+        :return:
+        """
         exit_program = False
 
-        while not exit_program:
-            user_input = input(f"{self.user}:")
+        print("\nYou've entered the jsFinance tracker! Type any command to begin! (type 'help' to see list of commands).")
+
+
+        # try-finally block makes sure that connection closes out even if unhandled errors arise
+        try:
+            while not exit_program:
+                user_input = input(f"{self.user}:")
+        finally:
+            # if self.connection isn't none, then close the connection
+            if self.connection:
+                self.close_connection()
 
     def commit_to_database(self):
         self.connection.commit()
@@ -97,6 +112,7 @@ class jsFinance:
 
 def main():
     program_instance = jsFinance()
+    program_instance.run()
     program_instance.close_connection()
 
 
