@@ -1,12 +1,6 @@
--- need to make a way to move money between accounts
-
--- procedure: deposit (puts cash into an account)
--- procedure: take out a loan (puts debt into an account)
--- buy_investment (takes cash out of current account and buys the specified investment)
--- sell_investment (sells specified investment and replaces it with cash)
-
 DELIMITER $$
 CREATE PROCEDURE deposit_money(IN transaction_date_p VARCHAR(50), IN account_reference_id_p INT, IN amount_p FLOAT)
+-- deposits money into an account
 BEGIN
 	-- Error Handling -------------------------------------------------------------------------------------------   
     -- Make sure account exists  
@@ -22,6 +16,7 @@ DELIMITER ;
 
 DELIMITER $$
 CREATE PROCEDURE take_loan(IN transaction_date_p VARCHAR(50), IN account_reference_id_p INT, IN amount_p FLOAT)
+-- creates debt within an account
 BEGIN
 	-- Error Handling -------------------------------------------------------------------------------------------   
     -- Make sure account exists  
@@ -35,9 +30,9 @@ BEGIN
 END $$
 DELIMITER ;
 
--- takes cash from the specified account and buys stock
 DELIMITER $$
 CREATE PROCEDURE buy_investment_shares(IN transaction_date_p VARCHAR(50), IN account_reference_id_p INT, IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
+-- takes cash from the specified account and buys stock
 BEGIN
 	DECLARE investment_daily_value FLOAT;
 	DECLARE investment_total_cost FLOAT;
@@ -69,9 +64,9 @@ BEGIN
 END $$
 DELIMITER ;
 
--- sells stock for CASH
 DELIMITER $$
 CREATE PROCEDURE sell_investment_shares(IN transaction_date_p VARCHAR(50), IN account_reference_id_p INT, IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
+-- sells stock for CASH
 BEGIN
 	DECLARE investment_daily_value FLOAT;
 	DECLARE investment_total_cost FLOAT;
