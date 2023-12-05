@@ -45,7 +45,6 @@ def parameter_parser(parameter_list):
     # Return the joined string
     return ", ".join(parameter_list)
 
-a=get_yfinance(get_valid_date())
 
 def update_stocks(database, stock_data: pd.DataFrame):
     with db.cursor() as cursor:

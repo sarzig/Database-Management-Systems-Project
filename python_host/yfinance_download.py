@@ -1,18 +1,35 @@
 import datetime
 import yfinance as yf
 import pandas as pd
-import tabulate as tabulate
 
 
 def get_valid_date():
     """
     Prompts user for day, month, year. If date is a valid WEEKDAY date in the past, it returns a datetime object.
-    :return:
+
+    If user enters nothing for all three dates, then get_valid_date exits.
+    :return: Either a valid date (datetime.date object) or None.
     """
     print("Provide a date to calculate stock prices (must be weekday):")
-    month_input = input("Month:")
-    day_input = input("Day:")
-    year_input = input("Year:")
+    month_input = input("Month:").lower()
+    if month_input == "q":
+        print('You have entered "q". Exiting date selection.')
+        return None
+
+    day_input = input("Day:").lower()
+    if day_input == "q":
+        print('You have entered "q". Exiting date selection.')
+        return None
+
+    year_input = input("Year:").lower()
+    if year_input == "q":
+        print('You have entered "q". Exiting date selection.')
+        return None
+
+    # If all entries are blank string or any are "q", return None
+    if month_input == "" and day_input == "" and year_input == "":
+        print("You have not selected a date. Exiting date selection.")
+        return None
 
     # Try to make a datetime object out of the inputs
     try:
@@ -22,12 +39,20 @@ def get_valid_date():
             int(day_input))
 
     except ValueError:
-        print(f'The attempted date {day_input}/{month_input}/{year_input} is not a valid date.')
+        print(f'The attempted date {day_input}/{month_input}/{year_input} is not a valid date. '
+              f'Type "q" to exit date selection.')
         return get_valid_date()
 
     # If selected day is a weekEND, there will be no stock data
     if selected_date.weekday() >= 5:
-        print(f'You selected a weekend date, {selected_date.strftime("%Y-%m-%d")}, please select another date.')
+        print(f'You selected a weekend date, {selected_date.strftime("%Y-%m-%d")}, please select another date. '
+              f"Type 'q' to exit date selection.")
+        return get_valid_date()
+
+    # If selected date is in the future, there will be no stock data
+    if selected_date > datetime.datetime.now().date():
+        print(f'You selected a date in the future, {selected_date.strftime("%Y-%m-%d")}, please select another date. '
+              f"Type 'q' to exit date selection.")
         return get_valid_date()
 
     # Reaching here means the date is VALID and NON-WEEKEND. Return the datetime object
