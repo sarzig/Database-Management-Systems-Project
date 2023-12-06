@@ -338,7 +338,7 @@ CREATE PROCEDURE create_user(
     IN last_name_p VARCHAR(100),
     IN family_id_p INT)
 BEGIN
--- procedure for creating user
+	-- procedure for creating user
 	-- error handling
     -- if email is already taken
 	IF EXISTS(SELECT * FROM users WHERE email = email_p) THEN
@@ -347,7 +347,7 @@ BEGIN
     ELSEIF first_name_p IS NULL OR email_p IS NULL THEN 
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'First name and email must be provided.';
 	-- if family id parameter doesn't exist
-    ELSEIF NOT EXISTS(SELECT * FROM families WHERE family_id = family_id_p) THEN
+    ELSEIF family_id_p IS NOT NULL AND NOT EXISTS(SELECT * FROM families WHERE family_id = family_id_p) THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Family ID is not found.';
 	END IF;
     
@@ -820,4 +820,67 @@ BEGIN
 		goals.goal_name,
         goals.goal_amount;
 END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE FUNCTION get_user_id(email_p VARCHAR(1000)) RETURNS INT
+DETERMINISTIC CONTAINS SQL
+BEGIN
+	DECLARE result INT;
+        
+	SELECT user_id INTO result
+	FROM users 
+	WHERE email = email_p;
+        
+	IF result IS NULL THEN
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "User ID does not exist, cannot get user.";
+
+		-- SET result = -1;
+	END IF;
+        
+	RETURN result;
+	
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE view_all_users()
+BEGIN
+	SELECT * FROM users;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE view_all_accounts()
+BEGIN
+	SELECT * FROM accounts;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE view_all_goals()
+BEGIN
+	SELECT * FROM goals;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE view_all_investments()
+BEGIN
+	SELECT * FROM investments;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE view_all_families()
+BEGIN
+	SELECT * FROM families;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE view_all_holdings()
+BEGIN
+	SELECT * FROM holdings;
+END$$
 DELIMITER ;

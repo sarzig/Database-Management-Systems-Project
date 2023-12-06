@@ -11,4 +11,5 @@ sql_query = f"SELECT * FROM get_user_id{email}"
 cursor.execute(sql_query)
 result = cursor.fetchall()
 
+cursor.execute("CALL view_all_users()")
 connection.close()

@@ -70,6 +70,8 @@ class jsFinance:
         self.command_dict = {
             "help": self.help_command,
             "exit": self.exit_program,
+            "view my account details": self.view_account_details_for_user,
+            "select user": self.select_user,
         }
 
     @staticmethod
@@ -161,9 +163,42 @@ class jsFinance:
         """
         print(f'Valid program commands are: {", ".join(self.command_dict)}')
 
-    def view_account_details_for_user(self, user_id):
+    def view_account_details_for_user(self):
         """
         Shows account details for current user.
-        :param user_id:
-        :return:
         """
+        # if user isn't none, execute
+        if self.user != "jsFinance Admin":
+            sql_txt = f"CALL view_accounts_details_for_user({self.user})"
+            print(sql_txt)
+
+            self.cursor.execute(sql_txt)
+            result = self.cursor.fetchall()
+            table = tabulate(pd.dataFrame(result), headers='keys', tablefmt='pretty', showindex=False)
+            print(table)
+        else:
+            print("Cannot show account details because user is not selected.")
+
+    def select_user(self):
+        """
+        Allows user to "login" by entering their email
+        """
+        # Request email from user
+        user_email = input("Enter user email:")
+
+        # Define the sql text
+        sql_txt = f'SELECT get_user_id("{user_email}")'
+        print(sql_txt)
+
+        try:
+            self.cursor.execute(sql_txt)
+            result = self.cursor.fetchall()
+
+        # Handle SQL operational errors (catching signals)
+        except pymysql.Error as e:
+            print(f"MySQL Error: {e}")
+
+        # Catch all other exceptions (unknown case)
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
