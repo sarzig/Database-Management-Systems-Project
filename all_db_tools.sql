@@ -832,10 +832,9 @@ BEGIN
 	FROM users 
 	WHERE email = email_p;
         
+	-- user does not exist -> error message
 	IF result IS NULL THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "User ID does not exist, cannot get user.";
-
-		-- SET result = -1;
 	END IF;
         
 	RETURN result;

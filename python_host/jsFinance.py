@@ -3,9 +3,8 @@ Filename: jsFinance.py
 Purpose : this file contains the jsFinance class. This class represents an instance of a command line interface. To
           interact with jsFinance class run the file "run_jsfinance.py" or see README.md for more guidance.
 """
-import re
+
 import time
-import pymysql
 from tabulate import tabulate
 import sys
 from helpers import *
@@ -53,6 +52,10 @@ def connect_via_command_line_input():
 
 
 class jsFinance:
+    """
+    todo: add documentation
+    """
+
     def __init__(self, authentication_dict=None):
         self.welcome_message()
 
@@ -72,7 +75,10 @@ class jsFinance:
             "exit": self.exit_program,
             "view my account details": self.view_account_details_for_user,
             "select user": self.select_user,
-            "admin mode": self.enter_admin_mode
+            "admin mode": self.enter_admin_mode,
+            "view my goals": self.view_goals_for_user,
+            "create family": self.create_family,
+            "view all families": self.view_all_families
         }
 
     @staticmethod
@@ -142,7 +148,15 @@ class jsFinance:
         """
         self.connection.close()
 
-    def execute_input(self, user_input:str):
+    def help_command(self):
+        """
+        Prints allowed commands at that point in the CLI program.
+        :return: VOID
+        """
+        # todo: if we want points for multi-user roles, should we be showing two lists: one for admin, one for user?
+        print(f'Valid program commands are: {", ".join(self.command_dict)}')
+
+    def execute_input(self, user_input: str):
         """
         Parses user_input and then executes the associated command from self.command_dict.
         :param user_input: string with desired command, like "help" or "show goals"
@@ -158,13 +172,6 @@ class jsFinance:
         # else, print helpful string
         else:
             print(f'The command "{user_input}" is unknown. Type "help" to see list of valid commands.')
-
-    def help_command(self):
-        """
-        Prints allowed commands at that point in the CLI program.
-        :return: VOID
-        """
-        print(f'Valid program commands are: {", ".join(self.command_dict)}')
 
     def view_account_details_for_user(self):
         """
@@ -305,4 +312,65 @@ class jsFinance:
         # Updates self.user to the selected user
         self.user = user_id
 
+    def view_goals_for_user(self):
+        """
+        Allows user to view their goals.
+        """
+        # todo: format similarly to view_accounts_details_for_user() for $ sign and $0.00
+        # if user isn't the admin, then execute
+        if self.user != "Admin":
 
+            # Define prompt
+            prompt = f"CALL view_goals_for_user({self.user})"
+
+            # Execute the sql code and then parse the results
+            cursor_output = self.sql_helper(prompt)
+            self.parse_result("print table", cursor_output)
+
+        # If no user is selected, print error message
+        else:
+            print("Cannot show user goals because user is not selected.")
+
+    def create_family(self):
+        """
+        Creates a family.
+        """
+        prompt = "CALL create_family"
+        input_requirements = [["Provide family name:", "string"]]
+
+        # Execute the sql code and then parse the results
+        cursor_output = self.sql_helper(prompt, input_requirements)
+
+        # todo: success code? how do we communicate success to user
+
+    def view_all_families(self):
+        """
+        Shows entire family table
+        """
+
+        # Define prompt
+        prompt = f"CALL view_all_families()"
+
+        # Execute the sql code and then parse the results
+        cursor_output = self.sql_helper(prompt)
+        self.parse_result("print table", cursor_output)
+
+    """
+    def view_all_users(self):
+        # joseph todo : model off of view_all_families
+
+    def view_all_accounts(self):
+        # joseph todo : model off of view_all_families
+
+    def view_all_goals(self):
+        # joseph todo : model off of view_all_families
+
+    def view_all_holdings(self):
+        # joseph todo : model off of view_all_families
+
+    def view_all_investments(self):
+        # joseph todo : model off of view_all_families
+
+    def view_user_transactions(self):
+        # joseph todo : model off of view_goals_for_user
+    """
