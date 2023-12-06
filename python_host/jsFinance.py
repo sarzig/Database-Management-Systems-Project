@@ -33,6 +33,10 @@ todo: update report (can we front load / get this out of the way on wednesday?)
 todo: figure out how to make this work for a no-password mysql
 
 todo: test building code on sarah's work machine
+
+todo: delete operations
+
+todo: transaction operations
 """
 
 import time
@@ -114,7 +118,7 @@ class jsFinance:
 
         self.cursor = self.connection.cursor()
         self.user = "Admin"  # tracks current user role
-        self.first_name = "Admin" # tracks current username
+        self.first_name = "Admin"  # tracks current username
         self.family = None  # IF self.user is not Admin (is a specific user), this holds the family information
 
         # Define dictionary of program commands
@@ -247,7 +251,7 @@ class jsFinance:
         Clears screen of cli.
         """
         # Clear the screen based on the operating system and re-print welcome message
-        print(os.name)
+        print_troubleshoot(os.name)
         if os.name == 'nt':
             os.system('cls')
             self.welcome_message()
@@ -496,7 +500,8 @@ class jsFinance:
         # If the results are a table, print them using tabulate
         if result_expectation == "print table":
             if sql_result_output:
-                print(tabulate(pd.DataFrame(sql_result_output), headers='keys', tablefmt='pretty', showindex=False))
+                # print(tabulate(pd.DataFrame(sql_result_output), headers='keys', tablefmt='pretty', showindex=False))
+                pretty_print_sql_results_table(sql_result_output)
             else:
                 print("There is nothing to show for that request.")
 

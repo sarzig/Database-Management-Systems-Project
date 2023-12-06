@@ -9,6 +9,22 @@ import datetime
 import yfinance as yf
 import pandas as pd
 import pymysql
+from tabulate import tabulate
+
+
+def pretty_print_sql_results_table(sql_result_table):
+    """
+    Given a sql result table, this function formats the table in a more aesthetically pleasing way.
+    id_at_institution becomes "ID At Institution", user_id becomes "User ID", email becomes "Email".
+    :param sql_result_table: the input table
+    """
+    # convert to DataFrame
+    df = pd.DataFrame(sql_result_table)
+
+    # Rename columns
+    df.columns = [col.replace("_", " ").title().replace(" Id", " ID").replace("Id ", "ID ").
+                      replace(" At ", " at ").replace(" Of ", " of") for col in df.columns]
+    print(tabulate(df, headers='keys', tablefmt='pretty', showindex=False))
 
 
 def extract_error_message_from_signal(error_text: str) -> str:
