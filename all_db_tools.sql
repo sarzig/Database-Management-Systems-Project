@@ -305,9 +305,9 @@ BEGIN
     ELSEIF NOT EXISTS (SELECT * FROM investments WHERE symbol = symbol_p) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Symbol is not found.';
 
-    -- if account reference ID doesn't exist
+    -- if account ID doesn't exist
     ELSEIF NOT EXISTS (SELECT * FROM accounts WHERE account_id = account_id_p) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Account reference ID is not found.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Account ID is not found.';
     END IF;
 
     -- since date has passed validation, convert the transaction date to a date format
@@ -906,7 +906,7 @@ DROP PROCEDURE IF EXISTS view_all_accounts;
 DELIMITER $$
 CREATE PROCEDURE view_all_accounts()
 BEGIN
-	SELECT account_reference_id,
+	SELECT account_id,
     id_at_institution,
     account_nickname,
     account_type,
@@ -963,7 +963,7 @@ BEGIN
     transaction_date,
     number_shares,
     symbol,
-    account_reference_id,
+    account_id,
     CONCAT('$ ', FORMAT(COALESCE(ROUND(value_transacted_at, 2), 0), 2)) AS "Value Transacted At"
     FROM transactions;
 END$$
