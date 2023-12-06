@@ -78,7 +78,13 @@ class jsFinance:
             "admin mode": self.enter_admin_mode,
             "view my goals": self.view_goals_for_user,
             "create family": self.create_family,
-            "view all families": self.view_all_families
+            "view all families": self.view_all_families,
+            "view all users": self.view_all_users,
+            "view all accounts": self.view_all_accounts,
+            "view all goals": self.view_all_goals,
+            "view all holdings": self.view_all_holdings,
+            "view all investments": self.view_all_investments,
+            "view my transactions": self.view_user_transactions
         }
 
     @staticmethod
@@ -355,22 +361,78 @@ class jsFinance:
         cursor_output = self.sql_helper(prompt)
         self.parse_result("print table", cursor_output)
 
-    """
+    
     def view_all_users(self):
-        # joseph todo : model off of view_all_families
+        """
+        Shows entire user table
+        """
 
+        # Define prompt
+        prompt = f"CALL view_all_users()"
+
+        # Execute the sql code and then parse the results
+        cursor_output = self.sql_helper(prompt)
+        self.parse_result("print table", cursor_output)
+
+    
     def view_all_accounts(self):
+        """
+        Shows entire account table
+        """
         # joseph todo : model off of view_all_families
+        
+        # Define prompt
+        prompt = f"CALL view_all_accounts()"
 
+        # Execute the sql code and then parse the results
+        cursor_output = self.sql_helper(prompt)
+        self.parse_result("print table", cursor_output)
+    
     def view_all_goals(self):
-        # joseph todo : model off of view_all_families
+        """
+        Shows entire goals table
+        """
+        
+        # Define prompt
+        prompt = f"CALL view_all_goals()"
+
+        # Execute the sql code and then parse the results
+        cursor_output = self.sql_helper(prompt)
+        self.parse_result("print table", cursor_output)
 
     def view_all_holdings(self):
-        # joseph todo : model off of view_all_families
+        """
+        Shows entire holdings table
+        """
+        
+        # Define prompt
+        prompt = f"CALL view_all_holdings()"
+
+        # Execute the sql code and then parse the results
+        cursor_output = self.sql_helper(prompt)
+        self.parse_result("print table", cursor_output)
 
     def view_all_investments(self):
-        # joseph todo : model off of view_all_families
+        """
+        Shows entire investments table
+        """
+        
+        # Define prompt
+        prompt = f"CALL view_all_investments()"
+
+        # Execute the sql code and then parse the results
+        cursor_output = self.sql_helper(prompt)
+        self.parse_result("print table", cursor_output)
 
     def view_user_transactions(self):
-        # joseph todo : model off of view_goals_for_user
-    """
+        """
+        Shows user's transactions
+        """
+        
+        # Define prompt
+        prompt = f"CALL view_user_transactions({self.user})"
+
+        # Execute the sql code and then parse the results
+        cursor_output = self.sql_helper(prompt)
+        self.parse_result("print table", cursor_output)
+    
