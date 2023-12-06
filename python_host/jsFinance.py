@@ -48,7 +48,7 @@ import os
 
 # todo: delete troubleshooting var at end
 global troubleshoot
-troubleshoot = False
+troubleshoot = True
 
 
 def print_troubleshoot(item_to_print:str):
@@ -479,7 +479,7 @@ class jsFinance:
         except pymysql.Error as e:
 
             # Extract the error text by finding portion in single quotes
-            print(f"Error: {extract_error_message_from_signal(str(e))}")
+            print(f"SQL Error: {extract_error_message_from_signal(str(e))}")
 
         # Catch all other exceptions (unknown case)
         except Exception as e:

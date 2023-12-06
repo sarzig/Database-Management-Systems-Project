@@ -9,7 +9,7 @@ from jsFinance import jsFinance
 
 
 def main():
-    auth_dict = {"host": "localhost", "user": "root", "password": "root1234"}  # cybersecurity # todo:remove password
+    auth_dict = {"host": "localhost", "user": "root", "password": "merapass"}  # cybersecurity # todo:remove password
     program_instance = jsFinance(auth_dict)
     program_instance.run()
 
