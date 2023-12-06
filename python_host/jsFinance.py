@@ -42,6 +42,20 @@ from helpers import *
 import os
 
 
+# todo: delete troubleshooting var
+global troubleshoot
+troubleshoot = True
+
+
+def print_troubleshoot(item_to_print:str):
+    """
+    Helper method to delete later. todo: delete.
+    :param item_to_print: item to print if troubleshooting is activated
+    """
+    if troubleshoot:
+        print("Troubleshoot purposes only:" + item_to_print)
+
+
 # Section: static methods
 
 def connect_via_command_line_input():
@@ -100,6 +114,7 @@ class jsFinance:
 
         self.cursor = self.connection.cursor()
         self.user = "Admin"  # tracks current user role
+        self.first_name = "Admin" # tracks current username
         self.family = None  # IF self.user is not Admin (is a specific user), this holds the family information
         self.status = None  # todo delete if needed
 
@@ -111,7 +126,8 @@ class jsFinance:
             "select user": self.select_user,
             "admin mode": self.enter_admin_mode,
             "view my goals": self.view_goals_for_user,
-            "view my family details": self.view_accounts_details_for_family_by_type,
+            "view my family detailed": self.view_accounts_details_for_family,
+            "view my family summary": self.view_accounts_details_for_family_by_type,
             "create family": self.create_family,
             "create user": self.create_user,
             "view all families": self.view_all_families,
@@ -157,7 +173,7 @@ class jsFinance:
         # try-finally block makes sure that connection closes out even if unhandled errors arise
         try:
             while not exit_program:
-                user_input = input(f"user:{self.user}:")
+                user_input = input(f"{self.first_name}:")
                 self.execute_input(user_input)
         finally:
             self.close_connection()
@@ -167,6 +183,7 @@ class jsFinance:
         Updates self.user to "Admin"
         """
         self.user = "Admin"
+        self.first_name = "Admin"
         self.family = None
 
     def exit_program(self):
@@ -301,7 +318,7 @@ class jsFinance:
 
         concatenated_parameter_list = "(" + ", ".join(parameter_list) + ")"
         # todo remove troubleshooting
-        print(f"Troubleshoot purposes only: concatenated_parameter_list = {concatenated_parameter_list}")
+        print_troubleshoot(f"concatenated_parameter_list = {concatenated_parameter_list}")
         return concatenated_parameter_list
 
     def sql_helper(self, function_or_procedure_call, input_requirements=None):
@@ -332,7 +349,7 @@ class jsFinance:
 
         # Define the sql text
         sql_txt = f'{function_or_procedure_call}{parameter_list}'
-        print(f"Troubleshoot purposes only: {sql_txt}")  # todo delete this troubleshooting
+        print_troubleshoot(f"{sql_txt}")  # todo delete this troubleshooting
 
         # Try executing the function/procedure in the database
         try:
@@ -363,24 +380,27 @@ class jsFinance:
         :param sql_result_output: the result from the cursor
         :return: parsed result based on the result_expectation. In some cases this simply means printing a table.
         """
-
-        # If there is no result (as in error cases), then return None
-        if not sql_result_output:
-            return None
-
         # If the results are a table, print them using tabulate
         if result_expectation == "print table":
-            print(tabulate(pd.DataFrame(sql_result_output), headers='keys', tablefmt='pretty', showindex=False))
+            if sql_result_output:
+                print(tabulate(pd.DataFrame(sql_result_output), headers='keys', tablefmt='pretty', showindex=False))
+            else:
+                print("There is nothing to show for that request.")
 
         # If the result is a single number, then return that number
         elif result_expectation == "single number":
-            first_dict = sql_result_output[0]
-            key, value = next(iter(first_dict.items()))
-            return value
+            if sql_result_output:
+                first_dict = sql_result_output[0]
+                key, value = next(iter(first_dict.items()))
+                return value
+            else:
+                print("There is nothing to show for that request.")
+                return None
 
         # otherwise, print an error statement
         else:
             print("Error in parse_result: unknown result_expectation.")
+            return None
 
     def select_user(self):
         """
@@ -397,13 +417,18 @@ class jsFinance:
         cursor_output = self.sql_helper(prompt, input_requirements)
         user_id = self.parse_result("single number", cursor_output)
 
-        print(f"Troubleshoot purposes only: user_id is now {user_id}")  # todo remove troubleshoot
+        print_troubleshoot(f"user_id for that user was calculated to be: {user_id}")  # todo remove troubleshoot
 
-        # Updates self.user to the selected user
-        self.user = user_id
+        # If result of parse result is NOT none, then we have new user_id
+        if user_id:
+            # Updates self.user to the selected user
+            self.user = user_id
 
-        # Call automatic_family_update to update self.family
-        self.automatic_family_update()
+            # Call automatic_family_update to update self.family
+            self.automatic_family_update()
+            self.automatic_first_name_update()
+        else:
+            print('That was not a valid user email. Try "view all users" to see valid emails.')
 
     def automatic_family_update(self):
         """
@@ -419,7 +444,7 @@ class jsFinance:
         cursor_output = self.sql_helper(prompt, input_requirements)
         family_id = self.parse_result("single number", cursor_output)
 
-        print(f"Troubleshoot purposes only: family_id was found to be {family_id}")  # todo remove troubleshoot
+        print_troubleshoot(f"family_id was found to be {family_id}")  # todo remove troubleshoot
 
         # Updates self.family to the selected family IF family_id is greater than 0
         if family_id > 0:
@@ -427,6 +452,30 @@ class jsFinance:
         # A user with no family will return get_user_family(user_id_p) = -1
         else:
             self.family = None
+
+    def automatic_first_name_update(self):
+        """
+        When the session's self.user is updated to a certain user, update the family accordingly.
+        """
+        # Define prompt and input requirements
+        prompt = "SELECT get_user_first_name"
+        input_requirements = [
+            {"user_input": None, "data": self.user, "data_type": "number"}
+        ]
+
+        # Execute the sql code and then parse the results
+        cursor_output = self.sql_helper(prompt, input_requirements)
+        first_name = self.parse_result("single number", cursor_output)
+
+        print_troubleshoot(f"first_name was found to be {first_name}")  # todo remove troubleshoot
+
+        # Updates self.family to the selected family IF family_id is greater than 0
+        if first_name != "":
+            self.first_name = first_name
+        # A user with no first_name will cause error
+        else:
+            # todo: actual error handling or nah?
+            print("Error: unknown state in automatic_first_name_update.")
 
     def create_family(self):
         """
@@ -482,6 +531,26 @@ class jsFinance:
             else:
                 print("User does not have a family to show details.")
 
+    def view_accounts_details_for_family(self):
+        """
+        Allows user to view their family's account details.
+        """
+        # if user family isn't None
+        if self.family:
+
+            # Define prompt
+            prompt = f"CALL view_accounts_details_for_family({self.family})"
+
+            # Execute the sql code and then parse the results
+            cursor_output = self.sql_helper(prompt)
+            self.parse_result("print table", cursor_output)
+
+        # If no user is selected, print error message
+        else:
+            if self.user == "Admin":
+                print("Select a user to show family details.")
+            else:
+                print("User does not have a family to show details.")
 
     def create_user(self):
         """

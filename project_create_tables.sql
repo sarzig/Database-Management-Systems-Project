@@ -36,7 +36,7 @@ CREATE TABLE goals (
 );
 
 CREATE TABLE accounts (
-	account_reference_id INT AUTO_INCREMENT PRIMARY KEY,
+	account_id INT AUTO_INCREMENT PRIMARY KEY,
     id_at_institution VARCHAR(50),
     institution_name VARCHAR(200), 
     account_nickname VARCHAR(50),
@@ -76,8 +76,8 @@ CREATE TABLE transactions (
 	CONSTRAINT fk_symbol_transactions FOREIGN KEY (symbol) REFERENCES investments(symbol) 
     ON UPDATE CASCADE ON DELETE RESTRICT,
     
-    account_reference_id INT,
-	CONSTRAINT fk_account_reference_id_transactions FOREIGN KEY (account_reference_id) REFERENCES accounts(account_reference_id) 
+    account_id INT,
+	CONSTRAINT fk_account_id_transactions FOREIGN KEY (account_id) REFERENCES accounts(account_id) 
     ON UPDATE CASCADE ON DELETE RESTRICT,
 
     value_transacted_at DECIMAL(13, 2)
@@ -91,8 +91,8 @@ CREATE TABLE holdings (
 	CONSTRAINT fk_symbol_holdings FOREIGN KEY (symbol) REFERENCES investments(symbol) 
     ON UPDATE CASCADE ON DELETE RESTRICT,
     
-    account_reference_id INT,
-	CONSTRAINT fk_account_reference_id_holdings FOREIGN KEY (account_reference_id) REFERENCES accounts(account_reference_id) 
+    account_id INT,
+	CONSTRAINT fk_account_id_holdings FOREIGN KEY (account_id) REFERENCES accounts(account_id) 
     ON UPDATE CASCADE ON DELETE RESTRICT,
 
     CONSTRAINT holdings_shares_cant_be_negative CHECK (number_shares >= 0)
@@ -240,7 +240,7 @@ INSERT INTO accounts (id_at_institution, institution_name, account_nickname, acc
 ("17261416", "FMC Corporation", "Freddie Mac", "loan", 2, 2),
 ("40639267", "Chase", "Ronak's 401(k)", "401(k)", 2, NULL);
 
-INSERT INTO holdings (account_reference_id, symbol, number_shares) VALUES
+INSERT INTO holdings (account_id, symbol, number_shares) VALUES
 (1, "CASH", 1000),
 (1, "CVS", 2), 
 (1, "PG", 32),
@@ -265,6 +265,6 @@ INSERT INTO holdings (account_reference_id, symbol, number_shares) VALUES
 (14, 'SO', 140.80),
 (14, 'PG', 135.90);
 
-INSERT INTO transactions(transaction_date, number_shares, symbol, account_reference_id, value_transacted_at) VALUES
+INSERT INTO transactions(transaction_date, number_shares, symbol, account_id, value_transacted_at) VALUES
 ("2022-10-05", 2, "SBUX", 1, 200),
 ("2022-10-06", 3, "AMZN", 1, 4);

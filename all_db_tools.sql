@@ -1,37 +1,37 @@
 DELIMITER $$
-CREATE PROCEDURE deposit_money(IN transaction_date_p VARCHAR(50), IN account_reference_id_p INT, IN amount_p FLOAT)
+CREATE PROCEDURE deposit_money(IN transaction_date_p VARCHAR(50), IN account_id_p INT, IN amount_p FLOAT)
 BEGIN
     -- deposits money into an account
 	-- Error Handling -------------------------------------------------------------------------------------------   
     -- Make sure account exists  
-    IF (SELECT COUNT(*) FROM accounts WHERE account_reference_id = account_reference_id_p) = 0 THEN
+    IF (SELECT COUNT(*) FROM accounts WHERE account_id = account_id_p) = 0 THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "Account does not exist.";
     END IF;
     
     -- make the transaction
-    CALL create_transaction(transaction_date_p, amount_p, "CASH", account_reference_id_p);
+    CALL create_transaction(transaction_date_p, amount_p, "CASH", account_id_p);
     
 END $$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE take_loan(IN transaction_date_p VARCHAR(50), IN account_reference_id_p INT, IN amount_p FLOAT)
+CREATE PROCEDURE take_loan(IN transaction_date_p VARCHAR(50), IN account_id_p INT, IN amount_p FLOAT)
 BEGIN
     -- creates debt within an account
 	-- Error Handling -------------------------------------------------------------------------------------------   
     -- Make sure account exists  
-    IF (SELECT COUNT(*) FROM accounts WHERE account_reference_id = account_reference_id_p) = 0 THEN
+    IF (SELECT COUNT(*) FROM accounts WHERE account_id = account_id_p) = 0 THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "Account does not exist.";
     END IF;
     
     -- make the transaction (always pass absolute value of amount)
-    CALL create_transaction(transaction_date_p, abs(amount_p), "DEBT", account_reference_id_p);
+    CALL create_transaction(transaction_date_p, abs(amount_p), "DEBT", account_id_p);
     
 END $$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE buy_investment_shares(IN transaction_date_p VARCHAR(50), IN account_reference_id_p INT, IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
+CREATE PROCEDURE buy_investment_shares(IN transaction_date_p VARCHAR(50), IN account_id_p INT, IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
 BEGIN
     -- takes cash from the specified account and buys stock
 
@@ -52,21 +52,21 @@ BEGIN
     -- See if enough cash is in account
     SELECT COUNT(*) > 0 INTO enough_cash_in_account 
     FROM holdings 
-    WHERE account_reference_id = account_reference_id_p AND symbol = "CASH" AND number_shares > investment_total_cost;
+    WHERE account_id = account_id_p AND symbol = "CASH" AND number_shares > investment_total_cost;
 	
     IF NOT enough_cash_in_account THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "Account doesn't contain sufficient cash funds to place trade.";
     END IF;
     
 	-- Execute trade - first delete cash and then buy the stock
-	CALL create_transaction(transaction_date_p, -1*investment_total_cost, "CASH", account_reference_id_p);
-	CALL create_transaction(transaction_date_p, number_shares_p, symbol_p, account_reference_id_p);
+	CALL create_transaction(transaction_date_p, -1*investment_total_cost, "CASH", account_id_p);
+	CALL create_transaction(transaction_date_p, number_shares_p, symbol_p, account_id_p);
 
 END $$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE sell_investment_shares(IN transaction_date_p VARCHAR(50), IN account_reference_id_p INT, IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
+CREATE PROCEDURE sell_investment_shares(IN transaction_date_p VARCHAR(50), IN account_id_p INT, IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
 BEGIN
 -- sells stock for CASH
 	DECLARE investment_daily_value FLOAT;
@@ -86,15 +86,15 @@ BEGIN
     -- See if that many shares of investment are in the account
     SELECT number_shares INTO shares_in_account 
     FROM holdings 
-    WHERE account_reference_id = account_reference_id_p AND symbol = symbol_p;
+    WHERE account_id = account_id_p AND symbol = symbol_p;
 	
     IF shares_in_account < number_shares_p THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "Not enough shares of investment are in the account.";
     END IF;
     
 	-- Execute trade - first delete cash and then buy the stock
-	CALL create_transaction(transaction_date_p, investment_total_cost, "CASH", account_reference_id_p);
-	CALL create_transaction(transaction_date_p, -1*number_shares_p, symbol_p, account_reference_id_p);
+	CALL create_transaction(transaction_date_p, investment_total_cost, "CASH", account_id_p);
+	CALL create_transaction(transaction_date_p, -1*number_shares_p, symbol_p, account_id_p);
 
 END $$
 DELIMITER ;
@@ -282,7 +282,7 @@ CREATE PROCEDURE create_transaction(
 	IN transaction_date_p VARCHAR(50),
     IN number_shares_p FLOAT,
     IN symbol_p VARCHAR(10),
-    IN account_reference_id_p INT
+    IN account_id_p INT
     )
 BEGIN
     DECLARE transaction_date_var DATE;
@@ -306,7 +306,7 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Symbol is not found.';
 
     -- if account reference ID doesn't exist
-    ELSEIF NOT EXISTS (SELECT * FROM accounts WHERE account_reference_id = account_reference_id_p) THEN
+    ELSEIF NOT EXISTS (SELECT * FROM accounts WHERE account_id = account_id_p) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Account reference ID is not found.';
     END IF;
 
@@ -317,16 +317,16 @@ BEGIN
     SELECT daily_value FROM investments where symbol = symbol_p INTO daily_value_var;
 
     -- create the transaction
-    INSERT INTO transactions(transaction_date, number_shares, symbol, account_reference_id, value_transacted_at)
-    VALUES (transaction_date_var, number_shares_p, symbol_p, account_reference_id_p, daily_value_var);
+    INSERT INTO transactions(transaction_date, number_shares, symbol, account_id, value_transacted_at)
+    VALUES (transaction_date_var, number_shares_p, symbol_p, account_id_p, daily_value_var);
     
     -- If there is already a holdings tuple with the given symbol in that account, update
-    IF EXISTS (SELECT * FROM holdings WHERE account_reference_id = account_reference_id_p AND symbol = symbol_p) THEN
-		UPDATE holdings SET number_shares = number_shares + number_shares_p WHERE account_reference_id = account_reference_id_p AND symbol = symbol_p;
+    IF EXISTS (SELECT * FROM holdings WHERE account_id = account_id_p AND symbol = symbol_p) THEN
+		UPDATE holdings SET number_shares = number_shares + number_shares_p WHERE account_id = account_id_p AND symbol = symbol_p;
 	-- if holdings tuple in that account DNE, create new tuple
     ELSE
-		INSERT into holdings(number_shares, symbol, account_reference_id) VALUES
-        (number_shares_p, symbol_p, account_reference_id_p);
+		INSERT into holdings(number_shares, symbol, account_id) VALUES
+        (number_shares_p, symbol_p, account_id_p);
     END IF;
 END $$
 DELIMITER ;
@@ -684,16 +684,16 @@ BEGIN
 	SELECT 
 		accounts.account_nickname AS "Account Name",
 		accounts.account_type AS "Account Type",
-		ROUND(SUM(number_shares * daily_value), 2) AS "Account Value"
+		CONCAT('$ ', FORMAT(SUM(number_shares * daily_value), 2)) AS "Account Value"
 	FROM holdings 
 	JOIN investments ON holdings.symbol = investments.symbol 
-	JOIN accounts ON holdings.account_reference_id = accounts.account_reference_id
+	JOIN accounts ON holdings.account_id = accounts.account_id
     JOIN users ON users.user_id = accounts.user_id
 	WHERE users.family_id = family_id_p
 	GROUP BY 
 		accounts.account_nickname,
 		accounts.account_type,
-		accounts.account_reference_id;
+		accounts.account_id;
 END $$
 DELIMITER ;
 
@@ -713,18 +713,24 @@ BEGIN
     
 	-- Execute view -------------------------------------------------------------------------------------------   
 	SELECT 
-    CONCAT('$', ROUND(SUM(CASE WHEN accounts.account_type != 'loan' THEN number_shares * daily_value 
+    CONCAT('$ ', FORMAT(SUM(
+		CASE WHEN accounts.account_type != 'loan' THEN number_shares * daily_value 
              ELSE 0 
-        END), 2)) AS "Total Assets",
-    CONCAT('$', ROUND(SUM(CASE WHEN accounts.account_type = 'loan' THEN number_shares * daily_value 
+        END
+        ), 2)) AS "Total Assets",
+    CONCAT('$ ', FORMAT(SUM(
+		CASE WHEN accounts.account_type = 'loan' THEN number_shares * daily_value 
              ELSE 0 
-        END), 2)) AS "Total Debts",
-    CONCAT('$', ROUND(SUM(CASE WHEN accounts.account_type = 'loan' THEN -1 * (number_shares * daily_value) 
+        END
+        ), 2)) AS "Total Debts",
+    CONCAT('$ ', FORMAT(SUM(
+		CASE WHEN accounts.account_type = 'loan' THEN -1 * (number_shares * daily_value) 
              ELSE number_shares * daily_value 
-        END), 2)) AS "Net Worth"
+        END
+        ), 2)) AS "Net Worth"
     FROM holdings 
     JOIN investments ON holdings.symbol = investments.symbol 
-    JOIN accounts ON holdings.account_reference_id = accounts.account_reference_id
+    JOIN accounts ON holdings.account_id = accounts.account_id
     JOIN users ON users.user_id = accounts.user_id
     WHERE users.family_id = family_id_p;
 END $$
@@ -751,12 +757,12 @@ BEGIN
 		concat("$ ", format(COALESCE(ROUND(SUM(number_shares * daily_value), 2), 0), 2)) AS "Account Value"
 	FROM holdings 
 	LEFT JOIN investments ON holdings.symbol = investments.symbol 
-	RIGHT JOIN accounts ON holdings.account_reference_id = accounts.account_reference_id
+	RIGHT JOIN accounts ON holdings.account_id = accounts.account_id
 	WHERE accounts.user_id = user_id_p
 	GROUP BY 
 		accounts.account_nickname,
 		accounts.account_type,
-		accounts.account_reference_id;
+		accounts.account_id;
 END $$
 DELIMITER ;
 
@@ -778,7 +784,7 @@ BEGIN
 	SELECT 
 	account_nickname, transaction_date, symbol, number_shares, concat("$ ", format(number_shares*value_transacted_at, 2)) AS total_amount
 	FROM transactions 
-	LEFT JOIN accounts ON transactions.account_reference_id = accounts.account_reference_id 
+	LEFT JOIN accounts ON transactions.account_id = accounts.account_id 
 	WHERE user_id = user_id_p
 	ORDER BY transaction_date DESC
 	LIMIT 20;
@@ -802,8 +808,8 @@ BEGIN
 	SELECT 
 		GROUP_CONCAT(DISTINCT accounts.account_nickname SEPARATOR ", ") AS "Account Name",
 		goals.goal_name AS "Goal Name",
-        ROUND(SUM(number_shares * daily_value), 2) AS "Current Value",
-        goals.goal_amount AS "Goal Amount",
+        CONCAT('$', FORMAT(SUM(number_shares * daily_value), 2)) AS "Current Value",
+        CONCAT('$', FORMAT(goals.goal_amount, 2)) AS "Goal Amount",
         CASE WHEN
         (ROUND(SUM(number_shares * daily_value), 2) > goals.goal_amount) = 1
         THEN "YES"
@@ -813,13 +819,13 @@ BEGIN
 
 	FROM holdings 
 	JOIN investments ON holdings.symbol = investments.symbol 
-	RIGHT JOIN accounts ON holdings.account_reference_id = accounts.account_reference_id
+	RIGHT JOIN accounts ON holdings.account_id = accounts.account_id
     JOIN goals ON accounts.user_id = goals.user_id AND accounts.goal_id = goals.goal_id
 	WHERE accounts.user_id = user_id_p
 	GROUP BY 
 		goals.goal_name,
         goals.goal_amount;
-END $$
+END$$
 DELIMITER ;
 
 DELIMITER $$
@@ -839,7 +845,7 @@ BEGIN
         
 	RETURN result;
 	
-END $$
+END$$
 DELIMITER ;
 
 DELIMITER $$
@@ -859,13 +865,40 @@ BEGIN
         
 	RETURN result;
 	
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE FUNCTION get_user_first_name(user_id_p INT) RETURNS VARCHAR(100)
+DETERMINISTIC CONTAINS SQL
+BEGIN
+	DECLARE result VARCHAR(100);
+        
+	SELECT first_name INTO result
+	FROM users 
+	WHERE user_id = user_id_p;
+        
+	-- user does not have first_name -> return -1
+	IF result IS NULL THEN
+		SELECT "" INTO result;
+	END IF;
+        
+	RETURN result;
+	
 END $$
 DELIMITER ;
+CALL 
 
 DELIMITER $$
 CREATE PROCEDURE view_all_users()
 BEGIN
-	SELECT * FROM users;
+	SELECT 
+		user_id AS "User ID", 
+        email, 
+        first_name AS "First Name",
+        last_name AS "Last Name",
+        family_name AS "Family"
+    FROM users LEFT JOIN families ON users.family_id = families.family_id;
 END$$
 DELIMITER ;
 
@@ -901,5 +934,12 @@ DELIMITER $$
 CREATE PROCEDURE view_all_holdings()
 BEGIN
 	SELECT * FROM holdings;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE view_all_transactions()
+BEGIN
+	SELECT * FROM transactions;
 END$$
 DELIMITER ;
