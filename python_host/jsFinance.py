@@ -67,8 +67,8 @@ class jsFinance:
             self.connection = connect_via_command_line_input()
 
         self.cursor = self.connection.cursor()
-        self.user = "Admin"
-        self.family = None
+        self.user = "Admin"  # tracks current user role
+        self.family = None  # IF self.user is not Admin (is a specific user), this holds the family information
         self.status = None  # todo delete if needed
 
         # Define dictionary of program commands
@@ -112,9 +112,7 @@ class jsFinance:
                 user_input = input(f"user:{self.user}:")
                 self.execute_input(user_input)
         finally:
-            # if self.connection isn't none, then close the connection
-            if self.connection:
-                self.close_connection()
+            self.close_connection()
 
     def enter_admin_mode(self):
         """
@@ -155,7 +153,21 @@ class jsFinance:
         """
         Closes connection with database.
         """
-        self.connection.close()
+
+        # if self.connection isn't None, then test if connection needs closing
+        if self.connection:
+
+            # Check if connection still exists
+            try:
+                self.connection.ping(reconnect=True)
+
+            # If there's an error, then do nothing
+            except pymysql.Error:
+                pass
+
+            # If pinging does NOT cause an error, call close()
+            else:
+                self.connection.close()
 
     def help_command(self):
         """
@@ -360,6 +372,9 @@ class jsFinance:
         # Updates self.family to the selected family IF family_id is greater than 0
         if family_id > 0:
             self.family = family_id
+        # A user with no family will return get_user_family(user_id_p) = -1
+        else:
+            self.family = None
 
     def create_family(self):
         """
