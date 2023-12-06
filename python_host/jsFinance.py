@@ -42,9 +42,9 @@ from helpers import *
 import os
 
 
-# todo: delete troubleshooting var
+# todo: delete troubleshooting var at end
 global troubleshoot
-troubleshoot = True
+troubleshoot = False
 
 
 def print_troubleshoot(item_to_print:str):
@@ -116,7 +116,6 @@ class jsFinance:
         self.user = "Admin"  # tracks current user role
         self.first_name = "Admin" # tracks current username
         self.family = None  # IF self.user is not Admin (is a specific user), this holds the family information
-        self.status = None  # todo delete if needed
 
         # Define dictionary of program commands
         """

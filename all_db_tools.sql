@@ -808,8 +808,8 @@ BEGIN
 	SELECT 
 		GROUP_CONCAT(DISTINCT accounts.account_nickname SEPARATOR ", ") AS "Account Name",
 		goals.goal_name AS "Goal Name",
-        CONCAT('$', FORMAT(SUM(number_shares * daily_value), 2)) AS "Current Value",
-        CONCAT('$', FORMAT(goals.goal_amount, 2)) AS "Goal Amount",
+        CONCAT('$ ', FORMAT(SUM(number_shares * daily_value), 2)) AS "Current Value",
+        CONCAT('$ ', FORMAT(goals.goal_amount, 2)) AS "Goal Amount",
         CASE WHEN
         (ROUND(SUM(number_shares * daily_value), 2) > goals.goal_amount) = 1
         THEN "YES"
