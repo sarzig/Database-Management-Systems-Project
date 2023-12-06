@@ -119,8 +119,11 @@ class jsFinance:
         self.status = None  # todo delete if needed
 
         # Define dictionary of program commands
+        """
         self.command_dict = {
-            "help": self.help_command,
+            "help": {"command": self.help_command,
+                     "user": True,
+                     "Admin": True},
             "exit": self.exit_program,
             "view my account details": self.view_account_details_for_user,
             "select user": self.select_user,
@@ -138,6 +141,117 @@ class jsFinance:
             "view all investments": self.view_all_investments,
             "view my transactions": self.view_user_transactions,
             "clear": self.clear_screen
+        }
+        """
+        self.command_dict = {}
+
+        self.command_dict["help"] = {
+            "command": self.help_command,
+            "user": True,
+            "Admin": True
+        }
+
+        self.command_dict["exit"] = {
+            "command": self.exit_program,
+            "user": True,
+            "Admin": True
+        }
+
+        self.command_dict["view my account details"] = {
+            "command": self.view_account_details_for_user,
+            "user": True,
+            "Admin": False
+        }
+
+        self.command_dict["select user"] = {
+            "command": self.select_user,
+            "user": True,
+            "Admin": True
+        }
+
+        self.command_dict["admin mode"] = {
+            "command": self.enter_admin_mode,
+            "user": True,
+            "Admin": True
+        }
+
+        self.command_dict["view my goals"] = {
+            "command": self.view_goals_for_user,
+            "user": True,
+            "Admin": False
+        }
+
+        self.command_dict["view my family detailed"] = {
+            "command": self.view_accounts_details_for_family,
+            "user": True,
+            "Admin": False
+        }
+
+        self.command_dict["view my family summary"] = {
+            "command": self.view_accounts_details_for_family_by_type,
+            "user": True,
+            "Admin": False
+        }
+
+        self.command_dict["create family"] = {
+            "command": self.create_family,
+            "user": False,
+            "Admin": True
+        }
+
+        self.command_dict["create user"] = {
+            "command": self.create_user,
+            "user": False,
+            "Admin": True
+        }
+
+        self.command_dict["view all families"] = {
+            "command": self.view_all_families,
+            "user": False,
+            "Admin": True
+        }
+
+        self.command_dict["view all users"] = {
+            "command": self.view_all_users,
+            "user": False,
+            "Admin": True
+        }
+
+        self.command_dict["view all accounts"] = {
+            "command": self.view_all_accounts,
+            "user": False,
+            "Admin": True
+        }
+
+        self.command_dict["view all goals"] = {
+            "command": self.view_all_goals,
+            "user": False,
+            "Admin": True
+        }
+
+        self.command_dict["view all holdings"] = {
+            "command": self.view_all_holdings,
+            "user": False,
+            "Admin": True
+        }
+
+        # 'view all investments' command
+        self.command_dict["view all investments"] = {
+            "command": self.view_all_investments,
+            "user": True,
+            "Admin": True
+        }
+
+        self.command_dict["view my transactions"] = {
+            "command": self.view_user_transactions,
+            "user": True,
+            "Admin": False
+        }
+
+        self.command_dict["clear"] = {
+            "command": self.clear_screen,
+            "user": True,
+            "Admin": True
         }
 
     @staticmethod
@@ -237,10 +351,15 @@ class jsFinance:
     def help_command(self):
         """
         Prints allowed commands at that point in the CLI program.
-        :return: VOID
         """
-        # todo: if we want points for multi-user roles, should we be showing two lists: one for admin, one for user?
-        print(f'Valid program commands are: {", ".join(self.command_dict)}')
+        # Parse out from self.command_dict which items are accessible to a user, and which are accessible to an Admin
+        user_commands = [command for command, details in self.command_dict.items() if details.get("user", False)]
+        admin_commands = [command for command, details in self.command_dict.items() if details.get("Admin", False)]
+
+        if self.user == "Admin":
+            print(f'Valid Admin commands are: {", ".join(admin_commands)}')
+        else:
+            print(f'Valid user commands are: {", ".join(user_commands)}')
 
     def execute_input(self, user_input: str):
         """
@@ -253,7 +372,20 @@ class jsFinance:
 
         # If input is a key in self.command_dict then run the function stored with that key
         if parsed_input in self.command_dict.keys():
-            self.command_dict[parsed_input]()
+            command_allowed_for_admin = self.command_dict[parsed_input]["Admin"]
+            command_allowed_for_user = self.command_dict[parsed_input]["user"]
+
+            # If user has authority to do that action then execute it
+            if (command_allowed_for_admin and self.user == "Admin") or \
+                    (command_allowed_for_user and self.user != "Admin"):
+                self.command_dict[parsed_input]["command"]()
+
+            # If user does NOT have the authority but it IS a valid command, print helpful message
+            else:
+                if self.user == "Admin":
+                    print('That command is only allowed for individual users. Type "select user" to enter user mode.')
+                else:
+                    print('That command is only allowed for Admins. Type "Admin mode" to exit user mode.')
 
         # else, print helpful string
         else:
