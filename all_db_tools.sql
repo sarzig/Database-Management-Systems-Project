@@ -912,7 +912,16 @@ DELIMITER ;
 DELIMITER $$
 CREATE PROCEDURE view_all_goals()
 BEGIN
+<<<<<<< Updated upstream
 	SELECT * FROM goals;
+=======
+	SELECT 
+		goal_id AS "Goal ID",
+        user_id AS "User ID",
+        goal_name AS "Goal Name",
+        concat("$ ", FORMAT(goal_amount, 2)) AS "Goal Amount"
+	FROM goals;
+>>>>>>> Stashed changes
 END$$
 DELIMITER ;
 
@@ -933,10 +942,14 @@ DELIMITER $$
 CREATE PROCEDURE view_all_families()
 BEGIN
 	-- Shows all families in the database
+<<<<<<< Updated upstream
 	SELECT
 		family_id AS "Family ID",
         family_name AS "Family Name"
     FROM families;
+=======
+	SELECT * FROM families;
+>>>>>>> Stashed changes
 END$$
 DELIMITER ;
 
