@@ -6,7 +6,7 @@ Purpose : this file contains the jsFinance class. This class represents an insta
 import re
 import time
 import pymysql
-import tabulate
+from tabulate import tabulate
 import sys
 from helpers import *
 
@@ -170,15 +170,18 @@ class jsFinance:
         """
         Shows account details for current user.
         """
-        # if user isn't none, execute
-        if self.user != "Admin":
-            sql_txt = f"CALL view_accounts_details_for_user({self.user})"
-            print(f"Troubleshoot purposes only:{sql_txt}")
 
-            self.cursor.execute(sql_txt)
-            result = self.cursor.fetchall()
-            table = tabulate.tabulate(pd.DataFrame(result), headers='keys', tablefmt='pretty', showindex=False)
-            print(table)
+        # if user isn't the admin, then execute
+        if self.user != "Admin":
+
+            # Define prompt
+            prompt = f"CALL view_accounts_details_for_user({self.user})"
+
+            # Execute the sql code and then parse the results
+            cursor_output = self.sql_helper(prompt)
+            self.parse_result("print table", cursor_output)
+
+        # If no user is selected, print error message
         else:
             print("Cannot show account details because user is not selected.")
 
@@ -206,16 +209,17 @@ class jsFinance:
                 parameter_list.append(f'"{input_placeholder}"')
 
         concatenated_parameter_list = "(" + ", ".join(parameter_list) + ")"
-        print(f"Troubleshoot purposes only: concatenated_parameter_list = {concatenated_parameter_list}")  # todo remove troubleshooting
+        # todo remove troubleshooting
+        print(f"Troubleshoot purposes only: concatenated_parameter_list = {concatenated_parameter_list}")
         return concatenated_parameter_list
 
-    def sql_helper(self, function_or_procedure_call, input_requirements):
+    def sql_helper(self, function_or_procedure_call, input_requirements=None):
         """
         This helper method does the heavy lifting for interacting with the database. It:
             (1) prompts the user for inputs
             (2) parses them via get_input_tuple
             (3) executes the sql against the database
-            (4)
+            (4) returns the result from self.cursor.fetchall()
         and the
         :param function_or_procedure_call: the sql query statement, like "SELECT get_user_id"
         :param input_requirements: a list of lists of prompts and data types,
@@ -223,8 +227,13 @@ class jsFinance:
         :return: the cursors fetchall result
         """
 
-        # Get parameter string
-        parameter_list = self.get_input_tuple(input_requirements)
+        # Get parameter string if there are input_requirements
+        if input_requirements:
+            parameter_list = self.get_input_tuple(input_requirements)
+
+        # If there are no input requirements then there are no parameters
+        else:
+            parameter_list = ""
 
         # Define the sql text
         sql_txt = f'{function_or_procedure_call}{parameter_list}'
@@ -252,30 +261,46 @@ class jsFinance:
 
     @staticmethod
     def parse_result(result_expectation, sql_result_output):
+        """
+        Given a result expectation and a cursor output, this function parses the result in the desired manner.
 
+        :param result_expectation: "print table", "single number", or None
+        :param sql_result_output: the result from the cursor
+        :return: parsed result based on the result_expectation. In some cases this simply means printing a table.
+        """
+
+        # If there is no result (as in error cases), then return None
+        if not sql_result_output:
+            return None
+
+        # If the results are a table, print them using tabulate
         if result_expectation == "print table":
-            print("TABLE")
+            print(tabulate(pd.DataFrame(sql_result_output), headers='keys', tablefmt='pretty', showindex=False))
 
+        # If the result is a single number, then return that number
         elif result_expectation == "single number":
             first_dict = sql_result_output[0]
             key, value = next(iter(first_dict.items()))
             return value
 
+        # otherwise, print an error statement
         else:
-            print("troubleshooting: parse_result: unknown result_expectation")
+            print("Error in parse_result: unknown result_expectation.")
 
     def select_user(self):
         """
         Allows user to "login" by entering their email. If the email is found in users table, then
         self.user will be updated.
         """
-
+        # Define prompt and input requirements
         prompt = "SELECT get_user_id"
         input_requirements = [["Provide user email:", "string"]]
+
+        # Execute the sql code and then parse the results
         cursor_output = self.sql_helper(prompt, input_requirements)
         user_id = self.parse_result("single number", cursor_output)
 
-        print(f"troubleshooting: user_id is now {user_id}")  # todo remove troubleshoot
+        print(f"Troubleshoot purposes only: user_id is now {user_id}")  # todo remove troubleshoot
 
         # Updates self.user to the selected user
         self.user = user_id
