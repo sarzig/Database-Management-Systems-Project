@@ -902,44 +902,75 @@ BEGIN
 END$$
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS view_all_accounts;
 DELIMITER $$
 CREATE PROCEDURE view_all_accounts()
 BEGIN
-	SELECT * FROM accounts;
+	SELECT account_reference_id AS "Account ID",
+    id_at_institution AS "Institution ID",
+    account_nickname AS "Account Name",
+    account_type AS "Account Type",
+    user_id AS "User ID",
+    FORMAT(COALESCE(goal_id, 0), 0) AS "Goal ID"
+    FROM accounts;
 END$$
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS view_all_goals;
 DELIMITER $$
 CREATE PROCEDURE view_all_goals()
 BEGIN
-	SELECT * FROM goals;
+	SELECT goal_id AS "Goal ID",
+    goal_name AS "Goal Name",
+    CONCAT('$ ', FORMAT(COALESCE(ROUND(goal_amount, 2), 0), 2)) AS "Goal Amount",
+    user_id AS "User ID"
+    FROM goals;
 END$$
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS view_all_investments;
 DELIMITER $$
 CREATE PROCEDURE view_all_investments()
 BEGIN
-	SELECT * FROM investments;
+	SELECT symbol AS "Symbol", 
+    company_name AS "Company Name",
+    CONCAT('$ ', FORMAT(COALESCE(ROUND(daily_value, 2), 0), 2)) AS "Daily Value"
+    FROM investments;
 END$$
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS view_all_families;
 DELIMITER $$
 CREATE PROCEDURE view_all_families()
 BEGIN
-	SELECT * FROM families;
+	SELECT family_id AS "Family ID",
+    family_name AS "Family Name"
+    FROM families;
 END$$
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS view_all_holdings;
 DELIMITER $$
 CREATE PROCEDURE view_all_holdings()
 BEGIN
-	SELECT * FROM holdings;
+	SELECT holdings_id AS "Holdings ID",
+    number_shares AS "Number of Shares",
+    symbol AS "Symbol",
+    account_reference_id AS "Account ID"
+    FROM holdings;
 END$$
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS view_all_transactions;
 DELIMITER $$
 CREATE PROCEDURE view_all_transactions()
 BEGIN
-	SELECT * FROM transactions;
+	SELECT transaction_id AS "Transaction ID",
+    transaction_date AS "Transaction Date",
+    number_shares AS "Number of Shares",
+    symbol AS "Symbol",
+    account_reference_id AS "Account ID",
+    CONCAT('$ ', FORMAT(COALESCE(ROUND(value_transacted_at, 2), 0), 2)) AS "Value Transacted At"
+    FROM transactions;
 END$$
 DELIMITER ;

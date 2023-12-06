@@ -210,6 +210,12 @@ class jsFinance:
             "Admin": True
         }
 
+        self.command_dict["view all transactions"] = {
+            "command": self.view_all_transactions,
+            "user": False,
+            "Admin": True
+        }
+
         # 'view all investments' command
         self.command_dict["view all investments"] = {
             "command": self.view_all_investments,
@@ -744,6 +750,18 @@ class jsFinance:
 
         # Define prompt
         prompt = f"CALL view_all_investments()"
+
+        # Execute the sql code and then parse the results
+        cursor_output = self.sql_helper(prompt)
+        self.parse_result("print table", cursor_output)
+    
+    def view_all_transactions(self):
+        """
+        Shows entire transactions table
+        """
+
+        # Define prompt
+        prompt = f"CALL view_all_transactions()"
 
         # Execute the sql code and then parse the results
         cursor_output = self.sql_helper(prompt)
