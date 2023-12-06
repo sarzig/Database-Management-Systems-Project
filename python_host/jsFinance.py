@@ -3,7 +3,7 @@ Filename: jsFinance.py
 Purpose : this file contains the jsFinance class. This class represents an instance of a command line interface. To
           interact with jsFinance class run the file "run_jsfinance.py" or see README.md for more guidance.
 """
-
+import re
 import time
 import pymysql
 import tabulate
@@ -101,7 +101,6 @@ class jsFinance:
             if self.connection:
                 self.close_connection()
 
-    @staticmethod
     def exit_program(self):
         """
         Commits changes to database, closes database connection, prints message to user, and then exits the CLI.
@@ -119,8 +118,8 @@ class jsFinance:
         print("|                                          exiting jsFinance                                         |")
         print("+----------------------------------------------------------------------------------------------------+")
 
-        # Sleep for 2 seconds
-        time.sleep(2)
+        # Sleep for 1 second
+        time.sleep(1)
 
         # Exit
         sys.exit(0)
@@ -179,24 +178,84 @@ class jsFinance:
         else:
             print("Cannot show account details because user is not selected.")
 
+    def get_input_tuple(self, input_requirements):
+        """
+        input_requirements is a list of pairs, where the first element of each pair is the input string (what is
+        displayed to the user) and the second element is the input datatype.
+        :param input_requirements:
+        :return: string which can be used to do a sql function call
+        """
+        parameter_list = []
+        for item in input_requirements:
+            input_placeholder = input(item[0])
+
+            if item[1] == "Number":
+                parameter_list.append(f'{input_placeholder}')
+            else:
+                parameter_list.append(f'"{input_placeholder}"')
+
+        concatenated_parameter_list = "(" + ", ".join(parameter_list) + ")"
+        print(f"concatenated_parameter_list = {concatenated_parameter_list}")
+        return concatenated_parameter_list
+
+    def sql_helper(self, function_or_procedure_call, input_requirements):
+
+        # Get parameter string
+        parameter_list = self.get_input_tuple(input_requirements)
+
+        # Define the sql text
+        sql_txt = f'{function_or_procedure_call}{parameter_list}'
+        print(f"Troubleshoot purposes only: {sql_txt}")
+
+        try:
+            self.cursor.execute(sql_txt)
+            result = self.cursor.fetchall()
+            return result
+
+        # Handle SQL error (catching signals written in our procedures/functions)
+        except pymysql.Error as e:
+
+            # Extract the error text by finding portion in single quotes
+            print(f"Error: {extract_error_message_from_signal(str(e))}")
+
+        # Catch all other exceptions (unknown case)
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
     def select_user(self):
         """
-        Allows user to "login" by entering their email
+        Allows user to "login" by entering their email. If the email is found in users table, then
+        self.user will be updated.
         """
+
+        result = self.sql_helper(
+            "SELECT get_user_id",
+            [["Provide user email:", "string"]])
+        print(result)
+
+
+    def select_user2(self):
+        """
+        Allows user to "login" by entering their email. If the email is found in users table, then
+        self.user will be updated
+        """
+
         # Request email from user
         user_email = input("Enter user email:")
 
         # Define the sql text
         sql_txt = f'SELECT get_user_id("{user_email}")'
-        print(sql_txt)
+        print(f"Troubleshoot purposes only: {sql_txt}")
 
         try:
             self.cursor.execute(sql_txt)
             result = self.cursor.fetchall()
 
-        # Handle SQL operational errors (catching signals)
+        # Handle SQL error (catching signals written in our procedures/functions)
         except pymysql.Error as e:
-            print(f"MySQL Error: {e}")
+
+            # Extract the error text by finding portion in single quotes
+            print(f"Error: {extract_error_message_from_signal(str(e))}")
 
         # Catch all other exceptions (unknown case)
         except Exception as e:

@@ -11,6 +11,26 @@ import pandas as pd
 import pymysql
 
 
+def extract_error_message_from_signal(error_text: str) -> str:
+    """
+    Given a message like Error: (1644, 'User ID does not exist, cannot get user.'), this
+    function extracts just the part within single quotes.
+    :param error_text: the error text to be parsed
+    :return: the parsed message between first and last single quotes
+    """
+
+    # If the message has multiple single quotes, we can parse it
+    if error_text.count("'") > 1:
+        # return text between first and last single color
+        first_quote_index = error_text.find("'") + 1
+        last_quote_index = error_text.rfind("'")
+        return error_text[first_quote_index:last_quote_index]
+
+    # Otherwise, just return the input
+    else:
+        return error_text
+
+
 def connect_to_sql_database(authentication_dict: dict):
     """
     Connects to jsfinance database using the username and password.

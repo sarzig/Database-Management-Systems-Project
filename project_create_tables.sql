@@ -102,7 +102,7 @@ INSERT INTO investments (symbol, company_name, daily_value) VALUES
 ("CASH", "Cash", 1),
 ("DEBT", "Debt", -1);
 
-/*
+
 INSERT INTO investments (symbol, company_name, daily_value) VALUES
 ("AAPL", "Apple Inc", 190.2100067138672),
 ("ABBV", "Abbvie Inc. Common Stock", 144.11000061035156),
@@ -240,32 +240,11 @@ INSERT INTO accounts (id_at_institution, institution_name, account_nickname, acc
 ("17261416", "FMC Corporation", "Freddie Mac", "loan", 2, 2),
 ("40639267", "Chase", "Ronak's 401(k)", "401(k)", 2, NULL);
 
-
-
-INSERT INTO investments (symbol, company_name, daily_value)
-VALUES
-("CASH", "Cash", 1),
-("DEBT", "Debt", -1),
-('AAPL', 'Apple Inc.', 150.25),
-('MSFT', 'Microsoft Corporation', 310.75),
-('GOOGL', 'Alphabet Inc.', 2700.50),
-('AMZN', 'Amazon.com Inc.', 3450.00),
-('FB', 'Meta Platforms, Inc.', 325.50),
-('TSLA', 'Tesla, Inc.', 800.60),
-('JPM', 'JPMorgan Chase & Co.', 155.20),
-('GS', 'The Goldman Sachs Group, Inc.', 380.40),
-('WMT', 'Walmart Inc.', 140.80),
-('PG', 'Procter & Gamble Co.', 135.90);
-
-SELECT * FROM accounts;
-
-SELECT * FROM holdings;
-INSERT INTO holdings (account_reference_id, symbol, number_shares)
-VALUES
+INSERT INTO holdings (account_reference_id, symbol, number_shares) VALUES
 (1, "CASH", 1000),
-(1, "TSLA", 2), 
+(1, "CVS", 2), 
 (1, "PG", 32),
-(2, "WMT", 100), 
+(2, "HON", 100), 
 (2, "GS", 2),
 (6, "DEBT", 9000.58),
 (7, "DEBT", 3000),
@@ -279,14 +258,13 @@ VALUES
 (14, 'MSFT', 310.75),
 (14, 'GOOGL', 2700.50),
 (14, 'AMZN', 3450.00),
-(14, 'FB', 325.50),
-(14, 'TSLA', 800.60),
-(14, 'JPM', 155.20),
-(14, 'GS', 380.40),
-(14, 'WMT', 140.80),
+(14, 'META', 325.50),
+(14, 'C', 800.60),
+(14, 'SBUX', 155.20),
+(14, 'SLB', 380.40),
+(14, 'SO', 140.80),
 (14, 'PG', 135.90);
 
 INSERT INTO transactions(transaction_date, number_shares, symbol, account_reference_id, value_transacted_at) VALUES
-("2022-10-05", 2, "TSLA", 1, 200),
-("2022-10-06", 3, "PG", 1, 4);
-*/
+("2022-10-05", 2, "SBUX", 1, 200),
+("2022-10-06", 3, "AMZN", 1, 4);
