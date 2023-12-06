@@ -171,9 +171,10 @@ END $$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE create_family(
-	IN family_name_p VARCHAR(100)
-    )
+CREATE FUNCTION create_family(
+	family_name_p VARCHAR(100)
+    ) RETURNS INT
+    DETERMINISTIC CONTAINS SQL
 BEGIN
 	-- Error Handling
     -- if family name is already taken
@@ -190,6 +191,8 @@ BEGIN
     -- create the family
     INSERT INTO FAMILIES(family_name) VALUES (family_name_p);
     
+    -- return the ID of the newly created family
+    RETURN LAST_INSERT_ID();
 END $$
 DELIMITER ;
 

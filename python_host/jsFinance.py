@@ -160,7 +160,7 @@ class jsFinance:
         }
         self.command_dict["create family"] = {
             "command": self.create_family,
-            "user": False,
+            "user": True,
             "Admin": True
         }
         self.command_dict["view all families"] = {
@@ -494,7 +494,11 @@ class jsFinance:
             if sql_result_output:
                 first_dict = sql_result_output[0]
                 key, value = next(iter(first_dict.items()))
-                return value
+                if isinstance(value, Number):
+                    return value
+                else:
+                    print("Error in parse result: expected numeric.")
+                    return None
             else:
                 print("There is nothing to show for that request.")
                 return None
@@ -579,19 +583,22 @@ class jsFinance:
             # todo: actual error handling or nah?
             print("Error: unknown state in automatic_first_name_update.")
 
-    def create_family(self):
+    def update_user_family(self, new_family_id:str):
         """
-        Creates a family.
+        Update's user's family to the new family ID.
         """
-        prompt = "CALL create_family"
+        prompt = "CALL update_user_family"
         input_requirements = [
-            {"user_input": "Provide family name:", "data": None, "data_type": "string"}
+            {"user_input": None, "data": new_family_id, "data_type": "number"},
+            {"user_input": None, "data": self.user, "data_type": "number"}
         ]
 
-        # Execute the sql code and then parse the results
-        cursor_output = self.sql_helper(prompt, input_requirements)
-
-        # todo: success code? how do we communicate success to user
+        # Execute the sql code
+        try:
+            cursor_output = self.sql_helper(prompt, input_requirements)
+            self.family = cursor_output
+        except Exception as e:
+            print(f"Error: {str(e)}")
 
     def create_user(self):
         """
@@ -638,6 +645,40 @@ class jsFinance:
 
         # Execute the sql code
         cursor_output = self.sql_helper(prompt, input_requirements)
+
+    def create_family(self):
+        """
+        Creates a new family. If in admin mode, this simply creates a family. If in user mode,
+        this will automatically associate the new family with the current user. If the current user already HAS a
+        family, then this will not do anything.
+        """
+
+        prompt = f"SELECT create_family"
+
+        # input requirements are slightly different for admin vs. user. If user already has a family, then stop
+        if self.user != "Admin":
+            # If user already has a family associated with themselves, print message and exit
+            if self.family:
+                print('Cannot create family as user already has a family associated. '
+                      'Try function "remove self from family"')
+                pass  # exit the function
+
+            # Otherwise if user has no family, create the family and then associate it with the given user
+
+        input_requirements = [
+                {"user_input": "Provide family name:", "data": None, "data_type": "string"}
+        ]
+
+        # Execute the sql code
+        cursor_output = self.sql_helper(prompt, input_requirements)
+        family_id = self.parse_result("single number", cursor_output)
+
+        print_troubleshoot(f"matthews new fam id is {family_id}")
+
+        # If self.user != "Admin", then associate family id with current user and update self.family
+        if self.user != "Admin":
+            self.family = family_id
+            self.update_user_family(family_id)
 
     def view_all_families(self):
         """
