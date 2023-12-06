@@ -63,7 +63,7 @@ class jsFinance:
             self.connection = connect_via_command_line_input()
 
         self.cursor = self.connection.cursor()
-        self.user = "jsFinance Admin"
+        self.user = "Admin"
         self.status = None
 
         # Define dictionary of program commands
@@ -72,6 +72,7 @@ class jsFinance:
             "exit": self.exit_program,
             "view my account details": self.view_account_details_for_user,
             "select user": self.select_user,
+            "admin mode": self.enter_admin_mode
         }
 
     @staticmethod
@@ -94,17 +95,22 @@ class jsFinance:
         # try-finally block makes sure that connection closes out even if unhandled errors arise
         try:
             while not exit_program:
-                user_input = input(f"{self.user}:")
+                user_input = input(f"user:{self.user}:")
                 self.execute_input(user_input)
         finally:
             # if self.connection isn't none, then close the connection
             if self.connection:
                 self.close_connection()
 
+    def enter_admin_mode(self):
+        """
+        Updates self.user to "Admin"
+        """
+        self.user = "Admin"
+
     def exit_program(self):
         """
         Commits changes to database, closes database connection, prints message to user, and then exits the CLI.
-        :return: VOID
         """
 
         # Commit changes to database
@@ -127,14 +133,12 @@ class jsFinance:
     def commit_to_database(self):
         """
         Commits changes to database.
-        :return: VOID
         """
         self.connection.commit()
 
     def close_connection(self):
         """
         Closes connection with database.
-        :return: VOID
         """
         self.connection.close()
 
@@ -167,26 +171,33 @@ class jsFinance:
         Shows account details for current user.
         """
         # if user isn't none, execute
-        if self.user != "jsFinance Admin":
+        if self.user != "Admin":
             sql_txt = f"CALL view_accounts_details_for_user({self.user})"
-            print(sql_txt)
+            print(f"Troubleshoot purposes only:{sql_txt}")
 
             self.cursor.execute(sql_txt)
             result = self.cursor.fetchall()
-            table = tabulate(pd.dataFrame(result), headers='keys', tablefmt='pretty', showindex=False)
+            table = tabulate.tabulate(pd.DataFrame(result), headers='keys', tablefmt='pretty', showindex=False)
             print(table)
         else:
             print("Cannot show account details because user is not selected.")
 
-    def get_input_tuple(self, input_requirements):
+    @staticmethod
+    def get_input_tuple(input_requirements):
         """
         input_requirements is a list of pairs, where the first element of each pair is the input string (what is
         displayed to the user) and the second element is the input datatype.
-        :param input_requirements:
-        :return: string which can be used to do a sql function call
+        :param input_requirements: a list of lists of prompts and data types,
+               like [["Input a number:", "Number"],["Input a string:", "String"]]
+        :return: a string representing the output of the user input, like "(5, "Hello world!")"
         """
+
+        # initialize the list of parameter values
         parameter_list = []
+
+        # Iterate across each input requirement
         for item in input_requirements:
+            # Prompt the user with the first item in the list
             input_placeholder = input(item[0])
 
             if item[1] == "Number":
@@ -195,21 +206,35 @@ class jsFinance:
                 parameter_list.append(f'"{input_placeholder}"')
 
         concatenated_parameter_list = "(" + ", ".join(parameter_list) + ")"
-        print(f"concatenated_parameter_list = {concatenated_parameter_list}")
+        print(f"Troubleshoot purposes only: concatenated_parameter_list = {concatenated_parameter_list}")  # todo remove troubleshooting
         return concatenated_parameter_list
 
     def sql_helper(self, function_or_procedure_call, input_requirements):
+        """
+        This helper method does the heavy lifting for interacting with the database. It:
+            (1) prompts the user for inputs
+            (2) parses them via get_input_tuple
+            (3) executes the sql against the database
+            (4)
+        and the
+        :param function_or_procedure_call: the sql query statement, like "SELECT get_user_id"
+        :param input_requirements: a list of lists of prompts and data types,
+               like [["Input a number:", "Number"],["Input a string:", "String"]]
+        :return: the cursors fetchall result
+        """
 
         # Get parameter string
         parameter_list = self.get_input_tuple(input_requirements)
 
         # Define the sql text
         sql_txt = f'{function_or_procedure_call}{parameter_list}'
-        print(f"Troubleshoot purposes only: {sql_txt}")
+        print(f"Troubleshoot purposes only: {sql_txt}")  # todo delete this troubleshooting
 
+        # Try executing the function/procedure in the database
         try:
             self.cursor.execute(sql_txt)
             result = self.cursor.fetchall()
+            # If no error arises, return the result
             return result
 
         # Handle SQL error (catching signals written in our procedures/functions)
@@ -220,7 +245,24 @@ class jsFinance:
 
         # Catch all other exceptions (unknown case)
         except Exception as e:
-            print(f"An error occurred: {e}")
+            print(f"An unknown error occurred: {e}")
+
+        # In error cases, return None
+        return None
+
+    @staticmethod
+    def parse_result(result_expectation, sql_result_output):
+
+        if result_expectation == "print table":
+            print("TABLE")
+
+        elif result_expectation == "single number":
+            first_dict = sql_result_output[0]
+            key, value = next(iter(first_dict.items()))
+            return value
+
+        else:
+            print("troubleshooting: parse_result: unknown result_expectation")
 
     def select_user(self):
         """
@@ -228,36 +270,14 @@ class jsFinance:
         self.user will be updated.
         """
 
-        result = self.sql_helper(
-            "SELECT get_user_id",
-            [["Provide user email:", "string"]])
-        print(result)
+        prompt = "SELECT get_user_id"
+        input_requirements = [["Provide user email:", "string"]]
+        cursor_output = self.sql_helper(prompt, input_requirements)
+        user_id = self.parse_result("single number", cursor_output)
 
+        print(f"troubleshooting: user_id is now {user_id}")  # todo remove troubleshoot
 
-    def select_user2(self):
-        """
-        Allows user to "login" by entering their email. If the email is found in users table, then
-        self.user will be updated
-        """
+        # Updates self.user to the selected user
+        self.user = user_id
 
-        # Request email from user
-        user_email = input("Enter user email:")
-
-        # Define the sql text
-        sql_txt = f'SELECT get_user_id("{user_email}")'
-        print(f"Troubleshoot purposes only: {sql_txt}")
-
-        try:
-            self.cursor.execute(sql_txt)
-            result = self.cursor.fetchall()
-
-        # Handle SQL error (catching signals written in our procedures/functions)
-        except pymysql.Error as e:
-
-            # Extract the error text by finding portion in single quotes
-            print(f"Error: {extract_error_message_from_signal(str(e))}")
-
-        # Catch all other exceptions (unknown case)
-        except Exception as e:
-            print(f"An error occurred: {e}")
 
