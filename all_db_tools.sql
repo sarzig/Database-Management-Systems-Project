@@ -183,7 +183,7 @@ BEGIN
     ELSEIF LENGTH(family_name_p) > 100 THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Family name exceeds 50 characters.';
     -- if family name is null
-    ELSEIF family_name_p IS NULL THEN 
+    ELSEIF family_name_p IS NULL OR family_name_p = '' THEN 
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Family name must be provided.';
 	END IF;
     

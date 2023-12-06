@@ -9,5 +9,6 @@ CALL create_investment("FB", "FABECOK", 20.62);
 CALL update_stock_daily_value("FB", 20000);
 
 SELECT * FROM users;
+SELECT * FROM families;
 
 CALL view_accounts_details_for_user(1);
