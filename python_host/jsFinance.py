@@ -620,29 +620,24 @@ class jsFinance:
 
         # input requirements are slightly different for admin vs. user. For user, the user_id is automatically  passed
         if self.user == "Admin":
-            input_requirements = [
-                {"user_input": "Provide account ID at institution:", "data": None, "data_type": "string"},
-                {"user_input": "Provide institution name:", "data": None, "data_type": "string"},
-                {"user_input": "Provide account nickname:", "data": None, "data_type": "string"},
-                {"user_input": "Provide account type (loan, checkings, savings, 401(k), roth IRA, "
-                               "traditional IRA, 529, taxable brokerage):", "data": None, "data_type": "string"},
-                {"user_input": "Provide user_id:", "data": None, "data_type": "number"},
-                {"user_input": None, "data": "NULL", "data_type": "number"},
-            ]
+            user_id_input = None
+            user_id_request_message = "Provide user ID:"
         else:
-            input_requirements = [
+            user_id_input = self.user
+            user_id_request_message = None
+
+        input_requirements = [
                 {"user_input": "Provide account ID at institution:", "data": None, "data_type": "string"},
                 {"user_input": "Provide institution name:", "data": None, "data_type": "string"},
                 {"user_input": "Provide account nickname:", "data": None, "data_type": "string"},
                 {"user_input": "Provide account type (loan, checkings, savings, 401(k), roth IRA, "
                                "traditional IRA, 529, taxable brokerage):", "data": None, "data_type": "string"},
-                {"user_input": None, "data": self.user, "data_type": "number"},
+                {"user_input": user_id_request_message, "data": user_id_input, "data_type": "number"},
                 {"user_input": None, "data": "NULL", "data_type": "number"},
-            ]
+        ]
 
         # Execute the sql code
         cursor_output = self.sql_helper(prompt, input_requirements)
-
 
     def view_all_families(self):
         """

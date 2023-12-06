@@ -748,8 +748,10 @@ BEGIN
     
 	-- Execute view -------------------------------------------------------------------------------------------   
     SELECT 
+		accounts.id_at_institution,
+        accounts.institution_name,
         accounts.account_nickname AS "Account Name",
-        accounts.account_type AS "Account Type",
+        accounts.account_type,
         CONCAT("$ ", FORMAT(COALESCE(ROUND(SUM(COALESCE(number_shares, 0) * COALESCE(daily_value, 0)), 2), 0), 2)) AS "Account Value"
     FROM accounts
     LEFT JOIN holdings ON accounts.account_id = holdings.account_id
@@ -898,7 +900,6 @@ BEGIN
 END$$
 DELIMITER ;
 
-DROP PROCEDURE IF EXISTS view_all_accounts;
 DELIMITER $$
 CREATE PROCEDURE view_all_accounts()
 BEGIN
@@ -912,7 +913,6 @@ BEGIN
 END$$
 DELIMITER ;
 
-DROP PROCEDURE IF EXISTS view_all_goals;
 DELIMITER $$
 CREATE PROCEDURE view_all_goals()
 BEGIN
@@ -924,7 +924,6 @@ BEGIN
 END$$
 DELIMITER ;
 
-DROP PROCEDURE IF EXISTS view_all_investments;
 DELIMITER $$
 CREATE PROCEDURE view_all_investments()
 BEGIN
@@ -935,7 +934,6 @@ BEGIN
 END$$
 DELIMITER ;
 
-DROP PROCEDURE IF EXISTS view_all_families;
 DELIMITER $$
 CREATE PROCEDURE view_all_families()
 BEGIN
@@ -943,7 +941,6 @@ BEGIN
 END$$
 DELIMITER ;
 
-DROP PROCEDURE IF EXISTS view_all_holdings;
 DELIMITER $$
 CREATE PROCEDURE view_all_holdings()
 BEGIN
@@ -951,7 +948,6 @@ BEGIN
 END$$
 DELIMITER ;
 
-DROP PROCEDURE IF EXISTS view_all_transactions;
 DELIMITER $$
 CREATE PROCEDURE view_all_transactions()
 BEGIN
