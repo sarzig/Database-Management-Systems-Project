@@ -7,9 +7,6 @@ Purpose : this file contains the main() function which runs our command line int
 
 from jsFinance import jsFinance
 
-troubleshoot = 1
-
-
 def main():
     auth_dict = {"host": "localhost", "user": "root", "password": "merapass"}  # cybersecurity # todo:remove password
     program_instance = jsFinance(auth_dict)

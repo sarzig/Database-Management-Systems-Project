@@ -843,6 +843,26 @@ END $$
 DELIMITER ;
 
 DELIMITER $$
+CREATE FUNCTION get_user_family(user_id_p INT) RETURNS INT
+DETERMINISTIC CONTAINS SQL
+BEGIN
+	DECLARE result INT;
+        
+	SELECT family_id INTO result
+	FROM users 
+	WHERE user_id = user_id_p;
+        
+	-- user does not have family -> return -1
+	IF result IS NULL THEN
+		SELECT -1 INTO result;
+	END IF;
+        
+	RETURN result;
+	
+END $$
+DELIMITER ;
+
+DELIMITER $$
 CREATE PROCEDURE view_all_users()
 BEGIN
 	SELECT * FROM users;

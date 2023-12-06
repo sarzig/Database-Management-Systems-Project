@@ -25,9 +25,10 @@ def connect_via_command_line_input():
     host = input("Enter database host (often 'localhost'): ").strip()
     username = input("Enter database username (often 'root'): ").strip()
     password = input("Enter database password: ").strip()
+    authentication_dict = {"host": host, "username": username, "password": password}
 
     # Attempt connection via connect_to_sql_database and then check validity of the result
-    database = connect_to_sql_database(host, username, password)
+    database = connect_to_sql_database(authentication_dict)
     connection_was_successful = isinstance(database, pymysql.connections.Connection)
 
     if connection_was_successful:
@@ -67,7 +68,8 @@ class jsFinance:
 
         self.cursor = self.connection.cursor()
         self.user = "Admin"
-        self.status = None
+        self.family = None
+        self.status = None  # todo delete if needed
 
         # Define dictionary of program commands
         self.command_dict = {
@@ -119,6 +121,7 @@ class jsFinance:
         Updates self.user to "Admin"
         """
         self.user = "Admin"
+        self.family = None
 
     def exit_program(self):
         """
@@ -129,7 +132,7 @@ class jsFinance:
         self.commit_to_database()
 
         # Close database connection
-        self.close_connection
+        self.close_connection()
 
         # Print helpful message
         print("+----------------------------------------------------------------------------------------------------+")
@@ -203,8 +206,11 @@ class jsFinance:
         """
         input_requirements is a list of pairs, where the first element of each pair is the input string (what is
         displayed to the user) and the second element is the input datatype.
-        :param input_requirements: a list of lists of prompts and data types,
-               like [["Input a number:", "Number"],["Input a string:", "String"]]
+        :param input_requirements: a list of dicts of prompts, data, and data types, like
+                [
+                 {"user_input": None, "data": 2, "data_type": Number},
+                 {"user_input": "Enter your name:", "data": None, "data_type": str}
+                ]
         :return: a string representing the output of the user input, like "(5, "Hello world!")"
         """
 
@@ -213,11 +219,19 @@ class jsFinance:
 
         # Iterate across each input requirement
         for item in input_requirements:
-            # Prompt the user with the first item in the list
-            input_placeholder = input(item[0])
+            # If the list element requires user input, then prompt for it:
+            if item["user_input"]:
+                input_placeholder = input(item["user_input"])
 
-            if item[1] == "Number":
+            # Otherwise, pass the data directly
+            else:
+                input_placeholder = item["data"]
+
+            # If data_type is numeric, then don't put double quotes
+            if item["data_type"] == "Number":
                 parameter_list.append(f'{input_placeholder}')
+
+            # If data_type is non-numeric, put double quotes around
             else:
                 parameter_list.append(f'"{input_placeholder}"')
 
@@ -233,10 +247,14 @@ class jsFinance:
             (2) parses them via get_input_tuple
             (3) executes the sql against the database
             (4) returns the result from self.cursor.fetchall()
-        and the
+
         :param function_or_procedure_call: the sql query statement, like "SELECT get_user_id"
-        :param input_requirements: a list of lists of prompts and data types,
-               like [["Input a number:", "Number"],["Input a string:", "String"]]
+        :param input_requirements: a list of dicts of prompts, data, and data types, like
+                [
+                 {"user_input": None, "data": 2, "data_type": "Number"},
+                 {"user_input": "Enter your name:", "data": None, "data_type": str}
+                ]
+
         :return: the cursors fetchall result
         """
 
@@ -307,7 +325,9 @@ class jsFinance:
         """
         # Define prompt and input requirements
         prompt = "SELECT get_user_id"
-        input_requirements = [["Provide user email:", "string"]]
+        input_requirements = [
+            {"user_input": "Provide user email:", "data": None, "data_type": "string"}
+        ]
 
         # Execute the sql code and then parse the results
         cursor_output = self.sql_helper(prompt, input_requirements)
@@ -317,6 +337,43 @@ class jsFinance:
 
         # Updates self.user to the selected user
         self.user = user_id
+
+        # Call automatic_family_update to update self.family
+        self.automatic_family_update()
+
+    def automatic_family_update(self):
+        """
+        When the session's self.user is updated to a certain user, update the family accordingly.
+        """
+        # Define prompt and input requirements
+        prompt = "SELECT get_user_family"
+        input_requirements = [
+            {"user_input": None, "data": self.user, "data_type": "Number"}
+        ]
+
+        # Execute the sql code and then parse the results
+        cursor_output = self.sql_helper(prompt, input_requirements)
+        family_id = self.parse_result("single number", cursor_output)
+
+        print(f"Troubleshoot purposes only: family_id was found to be {family_id}")  # todo remove troubleshoot
+
+        # Updates self.family to the selected family IF family_id is greater than 0
+        if family_id > 0:
+            self.family = family_id
+
+    def create_family(self):
+        """
+        Creates a family.
+        """
+        prompt = "CALL create_family"
+        input_requirements = [
+            {"user_input": "Provide family name:", "data": None, "data_type": "string"}
+        ]
+
+        # Execute the sql code and then parse the results
+        cursor_output = self.sql_helper(prompt, input_requirements)
+
+        # todo: success code? how do we communicate success to user
 
     def view_goals_for_user(self):
         """
@@ -337,18 +394,6 @@ class jsFinance:
         else:
             print("Cannot show user goals because user is not selected.")
 
-    def create_family(self):
-        """
-        Creates a family.
-        """
-        prompt = "CALL create_family"
-        input_requirements = [["Provide family name:", "string"]]
-
-        # Execute the sql code and then parse the results
-        cursor_output = self.sql_helper(prompt, input_requirements)
-
-        # todo: success code? how do we communicate success to user
-
     def view_all_families(self):
         """
         Shows entire family table
@@ -361,7 +406,6 @@ class jsFinance:
         cursor_output = self.sql_helper(prompt)
         self.parse_result("print table", cursor_output)
 
-    
     def view_all_users(self):
         """
         Shows entire user table
@@ -374,25 +418,24 @@ class jsFinance:
         cursor_output = self.sql_helper(prompt)
         self.parse_result("print table", cursor_output)
 
-    
     def view_all_accounts(self):
         """
         Shows entire account table
         """
         # joseph todo : model off of view_all_families
-        
+
         # Define prompt
         prompt = f"CALL view_all_accounts()"
 
         # Execute the sql code and then parse the results
         cursor_output = self.sql_helper(prompt)
         self.parse_result("print table", cursor_output)
-    
+
     def view_all_goals(self):
         """
         Shows entire goals table
         """
-        
+
         # Define prompt
         prompt = f"CALL view_all_goals()"
 
@@ -404,7 +447,7 @@ class jsFinance:
         """
         Shows entire holdings table
         """
-        
+
         # Define prompt
         prompt = f"CALL view_all_holdings()"
 
@@ -416,7 +459,7 @@ class jsFinance:
         """
         Shows entire investments table
         """
-        
+
         # Define prompt
         prompt = f"CALL view_all_investments()"
 
@@ -428,11 +471,10 @@ class jsFinance:
         """
         Shows user's transactions
         """
-        
+
         # Define prompt
         prompt = f"CALL view_user_transactions({self.user})"
 
         # Execute the sql code and then parse the results
         cursor_output = self.sql_helper(prompt)
         self.parse_result("print table", cursor_output)
-    
