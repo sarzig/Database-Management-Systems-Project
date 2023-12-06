@@ -919,14 +919,24 @@ DELIMITER ;
 DELIMITER $$
 CREATE PROCEDURE view_all_investments()
 BEGIN
-	SELECT * FROM investments;
+	-- Shows all investments in the database and their daily value
+	SELECT 
+		symbol, 
+        company_name AS "Company Name", 
+        concat("$ ", FORMAT(daily_value, 2)) AS "Daily Value"
+    FROM investments 
+    WHERE symbol != "CASH" AND symbol != "DEBT";
 END$$
 DELIMITER ;
 
 DELIMITER $$
 CREATE PROCEDURE view_all_families()
 BEGIN
-	SELECT * FROM families;
+	-- Shows all families in the database
+	SELECT
+		family_id AS "Family ID",
+        family_name AS "Family Name"
+    FROM families;
 END$$
 DELIMITER ;
 
