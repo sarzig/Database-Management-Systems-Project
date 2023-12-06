@@ -713,15 +713,15 @@ BEGIN
     
 	-- Execute view -------------------------------------------------------------------------------------------   
 	SELECT 
-    ROUND(SUM(CASE WHEN accounts.account_type != 'loan' THEN number_shares * daily_value 
+    CONCAT('$', ROUND(SUM(CASE WHEN accounts.account_type != 'loan' THEN number_shares * daily_value 
              ELSE 0 
-        END), 2) AS "Total Assets",
-    ROUND(SUM(CASE WHEN accounts.account_type = 'loan' THEN number_shares * daily_value 
+        END), 2)) AS "Total Assets",
+    CONCAT('$', ROUND(SUM(CASE WHEN accounts.account_type = 'loan' THEN number_shares * daily_value 
              ELSE 0 
-        END), 2) AS "Total Debts",
-    ROUND(SUM(CASE WHEN accounts.account_type = 'loan' THEN -1 * (number_shares * daily_value) 
+        END), 2)) AS "Total Debts",
+    CONCAT('$', ROUND(SUM(CASE WHEN accounts.account_type = 'loan' THEN -1 * (number_shares * daily_value) 
              ELSE number_shares * daily_value 
-        END), 2) AS "Net Worth"
+        END), 2)) AS "Net Worth"
     FROM holdings 
     JOIN investments ON holdings.symbol = investments.symbol 
     JOIN accounts ON holdings.account_reference_id = accounts.account_reference_id

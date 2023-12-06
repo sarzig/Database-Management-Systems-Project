@@ -39,6 +39,7 @@ import time
 from tabulate import tabulate
 import sys
 from helpers import *
+import os
 
 
 # Section: static methods
@@ -110,6 +111,7 @@ class jsFinance:
             "select user": self.select_user,
             "admin mode": self.enter_admin_mode,
             "view my goals": self.view_goals_for_user,
+            "view my family details": self.view_accounts_details_for_family_by_type,
             "create family": self.create_family,
             "create user": self.create_user,
             "view all families": self.view_all_families,
@@ -118,7 +120,8 @@ class jsFinance:
             "view all goals": self.view_all_goals,
             "view all holdings": self.view_all_holdings,
             "view all investments": self.view_all_investments,
-            "view my transactions": self.view_user_transactions
+            "view my transactions": self.view_user_transactions,
+            "clear": self.clear_screen
         }
 
     @staticmethod
@@ -127,6 +130,19 @@ class jsFinance:
         print("+----------------------------------------------------------------------------------------------------+")
         print("|                                 jsFinance Personal Finance Tracker                                 |")
         print("+----------------------------------------------------------------------------------------------------+")
+
+    def clear_screen(self):
+        """
+        Clears screen of cli.
+        """
+        # Clear the screen based on the operating system and re-print welcome message
+        print(os.name)
+        if os.name == 'nt':
+            os.system('cls')
+            self.welcome_message()
+        else:
+            os.system('clear')
+            self.welcome_message()
 
     def run(self):
         """
@@ -444,6 +460,28 @@ class jsFinance:
         # If no user is selected, print error message
         else:
             print("Cannot show user goals because user is not selected.")
+
+    def view_accounts_details_for_family_by_type(self):
+        """
+        Allows user to view their family's account summary.
+        """
+        # if user family isn't None
+        if self.family:
+
+            # Define prompt
+            prompt = f"CALL view_accounts_details_for_family_by_type({self.family})"
+
+            # Execute the sql code and then parse the results
+            cursor_output = self.sql_helper(prompt)
+            self.parse_result("print table", cursor_output)
+
+        # If no user is selected, print error message
+        else:
+            if self.user == "Admin":
+                print("Select a user to show family details.")
+            else:
+                print("User does not have a family to show details.")
+
 
     def create_user(self):
         """
