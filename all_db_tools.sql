@@ -747,18 +747,18 @@ BEGIN
     END IF;
     
 	-- Execute view -------------------------------------------------------------------------------------------   
-	SELECT 
-		accounts.account_nickname AS "Account Name",
-		accounts.account_type AS "Account Type",
-		concat("$ ", format(COALESCE(ROUND(SUM(number_shares * daily_value), 2), 0), 2)) AS "Account Value"
-	FROM holdings 
-	LEFT JOIN investments ON holdings.symbol = investments.symbol 
-	RIGHT JOIN accounts ON holdings.account_id = accounts.account_id
-	WHERE accounts.user_id = user_id_p
-	GROUP BY 
-		accounts.account_nickname,
-		accounts.account_type,
-		accounts.account_id;
+    SELECT 
+        accounts.account_nickname AS "Account Name",
+        accounts.account_type AS "Account Type",
+        CONCAT("$ ", FORMAT(COALESCE(ROUND(SUM(COALESCE(number_shares, 0) * COALESCE(daily_value, 0)), 2), 0), 2)) AS "Account Value"
+    FROM accounts
+    LEFT JOIN holdings ON accounts.account_id = holdings.account_id
+    LEFT JOIN investments ON holdings.symbol = investments.symbol 
+    WHERE accounts.user_id = user_id_p
+    GROUP BY 
+        accounts.account_nickname,
+        accounts.account_type,
+        accounts.account_id;
 END $$
 DELIMITER ;
 
