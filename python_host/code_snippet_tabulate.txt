@@ -1,18 +1,12 @@
-from jsFinance import *
-from helpers import *
-import pandas as pd
-from tabulate import tabulate
-
-
-auth_dict = {"host": "localhost", "user": "root", "password": "merapass"}  # cybersecurity # todo:remove password
-connection = connect_to_sql_database(auth_dict)
-cursor = connection.cursor()
-
+Library: tabulate
+command: pip install tabulate
+Info at: https://pypi.org/project/tabulate/
 
 
 # using pymysql
 from tabulate import tabulate
 import pandas as pd
+
 # use this code to convert your result to a df
 sql_result_output = cursor.fetchall()
 sql_df = pd.DataFrame(sql_result_output)

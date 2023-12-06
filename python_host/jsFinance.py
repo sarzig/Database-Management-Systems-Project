@@ -41,13 +41,12 @@ import sys
 from helpers import *
 import os
 
-
 # todo: delete troubleshooting var at end
 global troubleshoot
 troubleshoot = True
 
 
-def print_troubleshoot(item_to_print:str):
+def print_troubleshoot(item_to_print: str):
     """
     Helper method to delete later. todo: delete.
     :param item_to_print: item to print if troubleshooting is activated
@@ -119,121 +118,114 @@ class jsFinance:
 
         # Define dictionary of program commands
         self.command_dict = {}
-
         self.command_dict["help"] = {
             "command": self.help_command,
             "user": True,
             "Admin": True
         }
-
         self.command_dict["exit"] = {
             "command": self.exit_program,
             "user": True,
             "Admin": True
         }
-
+        self.command_dict["clear"] = {
+            "command": self.clear_screen,
+            "user": True,
+            "Admin": True
+        }
         self.command_dict["view my account details"] = {
             "command": self.view_account_details_for_user,
             "user": True,
             "Admin": False
         }
-
         self.command_dict["select user"] = {
             "command": self.select_user,
             "user": True,
             "Admin": True
         }
-
         self.command_dict["admin mode"] = {
             "command": self.enter_admin_mode,
             "user": True,
             "Admin": True
         }
-
+        self.command_dict["create user"] = {
+            "command": self.create_user,
+            "user": False,
+            "Admin": True
+        }
+        self.command_dict["create account"] = {
+            "command": self.create_account,
+            "user": True,
+            "Admin": True
+        }
+        self.command_dict["create family"] = {
+            "command": self.create_family,
+            "user": False,
+            "Admin": True
+        }
+        self.command_dict["view all families"] = {
+            "command": self.view_all_families,
+            "user": False,
+            "Admin": True
+        }
+        self.command_dict["view all users"] = {
+            "command": self.view_all_users,
+            "user": False,
+            "Admin": True
+        }
+        self.command_dict["view all accounts"] = {
+            "command": self.view_all_accounts,
+            "user": False,
+            "Admin": True
+        }
+        self.command_dict["view all goals"] = {
+            "command": self.view_all_goals,
+            "user": False,
+            "Admin": True
+        }
+        self.command_dict["view all holdings"] = {
+            "command": self.view_all_holdings,
+            "user": False,
+            "Admin": True
+        }
+        self.command_dict["view all transactions"] = {
+            "command": self.view_all_transactions,
+            "user": False,
+            "Admin": True
+        }
+        self.command_dict["view all investments"] = {
+            "command": self.view_all_investments,
+            "user": True,
+            "Admin": True
+        }
+        self.command_dict["view my transactions"] = {
+            "command": self.view_user_transactions,
+            "user": True,
+            "Admin": False
+        }
         self.command_dict["view my goals"] = {
             "command": self.view_goals_for_user,
             "user": True,
             "Admin": False
         }
-
         self.command_dict["view my family detailed"] = {
             "command": self.view_accounts_details_for_family,
             "user": True,
             "Admin": False
         }
-
         self.command_dict["view my family summary"] = {
             "command": self.view_accounts_details_for_family_by_type,
             "user": True,
             "Admin": False
         }
 
-        self.command_dict["create family"] = {
-            "command": self.create_family,
-            "user": False,
-            "Admin": True
-        }
+        # Build out menu options based on self.command_dict
+        user_commands = [command for command, details in self.command_dict.items() if details.get("user", False)]
+        admin_commands = [command for command, details in self.command_dict.items() if details.get("Admin", False)]
+        user_commands_menu = "User options are:\n    * " + "\n    * ".join(user_commands)
+        admin_commands_menu = "Admin options are:\n    * " + "\n    * ".join(admin_commands)
 
-        self.command_dict["create user"] = {
-            "command": self.create_user,
-            "user": False,
-            "Admin": True
-        }
-
-        self.command_dict["view all families"] = {
-            "command": self.view_all_families,
-            "user": False,
-            "Admin": True
-        }
-
-        self.command_dict["view all users"] = {
-            "command": self.view_all_users,
-            "user": False,
-            "Admin": True
-        }
-
-        self.command_dict["view all accounts"] = {
-            "command": self.view_all_accounts,
-            "user": False,
-            "Admin": True
-        }
-
-        self.command_dict["view all goals"] = {
-            "command": self.view_all_goals,
-            "user": False,
-            "Admin": True
-        }
-
-        self.command_dict["view all holdings"] = {
-            "command": self.view_all_holdings,
-            "user": False,
-            "Admin": True
-        }
-
-        self.command_dict["view all transactions"] = {
-            "command": self.view_all_transactions,
-            "user": False,
-            "Admin": True
-        }
-
-        # 'view all investments' command
-        self.command_dict["view all investments"] = {
-            "command": self.view_all_investments,
-            "user": True,
-            "Admin": True
-        }
-
-        self.command_dict["view my transactions"] = {
-            "command": self.view_user_transactions,
-            "user": True,
-            "Admin": False
-        }
-
-        self.command_dict["clear"] = {
-            "command": self.clear_screen,
-            "user": True,
-            "Admin": True
-        }
+        self.command_list = {"Admin": admin_commands_menu, "User": user_commands_menu}
 
     @staticmethod
     def welcome_message():
@@ -333,14 +325,10 @@ class jsFinance:
         """
         Prints allowed commands at that point in the CLI program.
         """
-        # Parse out from self.command_dict which items are accessible to a user, and which are accessible to an Admin
-        user_commands = [command for command, details in self.command_dict.items() if details.get("user", False)]
-        admin_commands = [command for command, details in self.command_dict.items() if details.get("Admin", False)]
-
         if self.user == "Admin":
-            print(f'Valid Admin commands are: {", ".join(admin_commands)}')
+            print(self.command_list["Admin"])
         else:
-            print(f'Valid user commands are: {", ".join(user_commands)}')
+            print(self.command_list["User"])
 
     def execute_input(self, user_input: str):
         """
@@ -605,67 +593,6 @@ class jsFinance:
 
         # todo: success code? how do we communicate success to user
 
-    def view_goals_for_user(self):
-        """
-        Allows user to view their goals.
-        """
-        # todo: format similarly to view_accounts_details_for_user() for $ sign and $0.00
-        # if user isn't the admin, then execute
-        if self.user != "Admin":
-
-            # Define prompt
-            prompt = f"CALL view_goals_for_user({self.user})"
-
-            # Execute the sql code and then parse the results
-            cursor_output = self.sql_helper(prompt)
-            self.parse_result("print table", cursor_output)
-
-        # If no user is selected, print error message
-        else:
-            print("Cannot show user goals because user is not selected.")
-
-    def view_accounts_details_for_family_by_type(self):
-        """
-        Allows user to view their family's account summary.
-        """
-        # if user family isn't None
-        if self.family:
-
-            # Define prompt
-            prompt = f"CALL view_accounts_details_for_family_by_type({self.family})"
-
-            # Execute the sql code and then parse the results
-            cursor_output = self.sql_helper(prompt)
-            self.parse_result("print table", cursor_output)
-
-        # If no user is selected, print error message
-        else:
-            if self.user == "Admin":
-                print("Select a user to show family details.")
-            else:
-                print("User does not have a family to show details.")
-
-    def view_accounts_details_for_family(self):
-        """
-        Allows user to view their family's account details.
-        """
-        # if user family isn't None
-        if self.family:
-
-            # Define prompt
-            prompt = f"CALL view_accounts_details_for_family({self.family})"
-
-            # Execute the sql code and then parse the results
-            cursor_output = self.sql_helper(prompt)
-            self.parse_result("print table", cursor_output)
-
-        # If no user is selected, print error message
-        else:
-            if self.user == "Admin":
-                print("Select a user to show family details.")
-            else:
-                print("User does not have a family to show details.")
-
     def create_user(self):
         """
         Creates a user in the database.
@@ -682,6 +609,40 @@ class jsFinance:
 
         # Execute the sql code
         cursor_output = self.sql_helper(prompt, input_requirements)
+
+    def create_account(self):
+        """
+        Creates a new user account. If in admin mode, this requires entering the user_id number. If in user mode,
+        this will automatically associate the new account with the session's current user.
+        """
+
+        prompt = f"CALL create_account"
+
+        # input requirements are slightly different for admin vs. user. For user, the user_id is automatically  passed
+        if self.user == "Admin":
+            input_requirements = [
+                {"user_input": "Provide account ID at institution:", "data": None, "data_type": "string"},
+                {"user_input": "Provide institution name:", "data": None, "data_type": "string"},
+                {"user_input": "Provide account nickname:", "data": None, "data_type": "string"},
+                {"user_input": "Provide account type (loan, checkings, savings, 401(k), roth IRA, "
+                               "traditional IRA, 529, taxable brokerage):", "data": None, "data_type": "string"},
+                {"user_input": "Provide user_id:", "data": None, "data_type": "number"},
+                {"user_input": None, "data": "NULL", "data_type": "number"},
+            ]
+        else:
+            input_requirements = [
+                {"user_input": "Provide account ID at institution:", "data": None, "data_type": "string"},
+                {"user_input": "Provide institution name:", "data": None, "data_type": "string"},
+                {"user_input": "Provide account nickname:", "data": None, "data_type": "string"},
+                {"user_input": "Provide account type (loan, checkings, savings, 401(k), roth IRA, "
+                               "traditional IRA, 529, taxable brokerage):", "data": None, "data_type": "string"},
+                {"user_input": None, "data": self.user, "data_type": "number"},
+                {"user_input": None, "data": "NULL", "data_type": "number"},
+            ]
+
+        # Execute the sql code
+        cursor_output = self.sql_helper(prompt, input_requirements)
+
 
     def view_all_families(self):
         """
@@ -755,7 +716,7 @@ class jsFinance:
         # Execute the sql code and then parse the results
         cursor_output = self.sql_helper(prompt)
         self.parse_result("print table", cursor_output)
-    
+
     def view_all_transactions(self):
         """
         Shows entire transactions table
@@ -779,3 +740,64 @@ class jsFinance:
         # Execute the sql code and then parse the results
         cursor_output = self.sql_helper(prompt)
         self.parse_result("print table", cursor_output)
+
+    def view_goals_for_user(self):
+        """
+        Allows user to view their goals.
+        """
+        # todo: format similarly to view_accounts_details_for_user() for $ sign and $0.00
+        # if user isn't the admin, then execute
+        if self.user != "Admin":
+
+            # Define prompt
+            prompt = f"CALL view_goals_for_user({self.user})"
+
+            # Execute the sql code and then parse the results
+            cursor_output = self.sql_helper(prompt)
+            self.parse_result("print table", cursor_output)
+
+        # If no user is selected, print error message
+        else:
+            print("Cannot show user goals because user is not selected.")
+
+    def view_accounts_details_for_family_by_type(self):
+        """
+        Allows user to view their family's account summary.
+        """
+        # if user family isn't None
+        if self.family:
+
+            # Define prompt
+            prompt = f"CALL view_accounts_details_for_family_by_type({self.family})"
+
+            # Execute the sql code and then parse the results
+            cursor_output = self.sql_helper(prompt)
+            self.parse_result("print table", cursor_output)
+
+        # If no user is selected, print error message
+        else:
+            if self.user == "Admin":
+                print("Select a user to show family details.")
+            else:
+                print("User does not have a family to show details.")
+
+    def view_accounts_details_for_family(self):
+        """
+        Allows user to view their family's account details.
+        """
+        # if user family isn't None
+        if self.family:
+
+            # Define prompt
+            prompt = f"CALL view_accounts_details_for_family({self.family})"
+
+            # Execute the sql code and then parse the results
+            cursor_output = self.sql_helper(prompt)
+            self.parse_result("print table", cursor_output)
+
+        # If no user is selected, print error message
+        else:
+            if self.user == "Admin":
+                print("Select a user to show family details.")
+            else:
+                print("User does not have a family to show details.")

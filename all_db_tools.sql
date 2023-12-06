@@ -131,7 +131,7 @@ BEGIN
     END IF;
     
 	-- Check if account_type_p is one of the specified enums
-    IF NOT account_type_p IN ('loan', 'checkings', 'savings', '401(k)', 'roth IRA', 'traditional IRA', '529', 'taxable brokerage', 'cryptocurrency') THEN
+    IF NOT account_type_p IN ('loan', 'checkings', 'savings', '401(k)', 'roth IRA', 'traditional IRA', '529', 'taxable brokerage') THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid account_type.';
     END IF;
 
@@ -175,7 +175,7 @@ CREATE PROCEDURE create_family(
 	IN family_name_p VARCHAR(100)
     )
 BEGIN
-	-- error handling
+	-- Error Handling
     -- if family name is already taken
 	IF EXISTS(SELECT * FROM families WHERE family_name = family_name_p) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'That family name is already taken.';
@@ -200,10 +200,10 @@ CREATE PROCEDURE create_goal(
     IN user_id_p INT
 )
 BEGIN
--- To create a goal, a goal name, amount, and user_id are needed.
--- Errors occur if a goal by that name already exists for the given user, or
--- if the given user does not exist.
--- Goal amounts can be positive, 0, or negative
+	-- To create a goal, a goal name, amount, and user_id are needed.
+	-- Errors occur if a goal by that name already exists for the given user, or
+	-- if the given user does not exist.
+	-- Goal amounts can be positive, 0, or negative
 	DECLARE goal_name_already_in_use BOOLEAN;
     DECLARE user_does_not_exist BOOLEAN;
     
@@ -244,7 +244,7 @@ BEGIN
 	DECLARE symbol_already_exists BOOLEAN;
     SELECT count(*) > 0 INTO symbol_already_exists FROM investments WHERE symbol = symbol_p;
     
-	-- error handling
+	-- Error Handling
     -- if symbol or company name is null
     IF symbol_p IS NULL OR company_name_p IS NULL THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'symbol and company name cannot be null.';
@@ -288,14 +288,10 @@ BEGIN
     DECLARE transaction_date_var DATE;
     DECLARE daily_value_var DECIMAL(13, 2);
 
-	-- error handling
+	-- Error Handling
     -- if date isn't in correct format
     IF STR_TO_DATE(transaction_date_p, '%Y-%m-%d') IS NULL THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Incorrect date format: please use YYYY-MM-DD.';
-
-    -- if number_shares is negative or 0
-    -- ELSEIF number_shares_p <= 0 THEN
-    --     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Number of shares must be positive.';
 
     -- if transaction date or number of shares are null
     ELSEIF transaction_date_p IS NULL OR number_shares_p IS NULL THEN
@@ -339,7 +335,7 @@ CREATE PROCEDURE create_user(
     IN family_id_p INT)
 BEGIN
 	-- procedure for creating user
-	-- error handling
+	-- Error Handling
     -- if email is already taken
 	IF EXISTS(SELECT * FROM users WHERE email = email_p) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'That email is already taken.';
@@ -587,7 +583,7 @@ CREATE PROCEDURE update_stock_daily_value(IN symbol_p VARCHAR(10), IN new_daily_
 )
 -- procedure for updating an investment's daily value
 BEGIN
-	-- error handling
+	-- Error Handling
     -- if symbol is null
     IF symbol_p IS NULL THEN 
 	    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Symbol cannot be null.';

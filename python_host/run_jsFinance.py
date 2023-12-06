@@ -10,6 +10,7 @@ import os
 
 
 def main():
+
     if os.name == "nt":
         # sarah pass
         auth_dict = {"host": "localhost", "user": "root", "password": "merapass"}  # cybersecurity # todo:remove password
