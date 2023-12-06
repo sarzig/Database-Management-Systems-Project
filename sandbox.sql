@@ -12,3 +12,4 @@ SELECT * FROM users;
 SELECT * FROM families;
 
 CALL view_accounts_details_for_user(1);
+

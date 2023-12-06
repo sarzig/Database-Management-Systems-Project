@@ -6,10 +6,17 @@ Purpose : this file contains the main() function which runs our command line int
 """
 
 from jsFinance import jsFinance
+import os
 
 
 def main():
-    auth_dict = {"host": "localhost", "user": "root", "password": "merapass"}  # cybersecurity # todo:remove password
+    if os.name == "nt":
+        # sarah pass
+        auth_dict = {"host": "localhost", "user": "root", "password": "merapass"}  # cybersecurity # todo:remove password
+    else:
+        # joseph pass
+        auth_dict = {"host": "localhost", "user": "root", "password": "root1234"}  # cybersecurity # todo:remove password
+
     program_instance = jsFinance(auth_dict)
     program_instance.run()
 

@@ -33,8 +33,7 @@ DELIMITER ;
 DELIMITER $$
 CREATE PROCEDURE buy_investment_shares(IN transaction_date_p VARCHAR(50), IN account_id_p INT, IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
 BEGIN
-    -- takes cash from the specified account and buys stock
-
+    -- takes CASH from the specified account and buys stock
 	DECLARE investment_daily_value FLOAT;
 	DECLARE investment_total_cost FLOAT;
     DECLARE enough_cash_in_account INT;
@@ -92,12 +91,13 @@ BEGIN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "Not enough shares of investment are in the account.";
     END IF;
     
-	-- Execute trade - first delete cash and then buy the stock
-	CALL create_transaction(transaction_date_p, investment_total_cost, "CASH", account_id_p);
+	-- Execute trade - first delete stock and then deposit the cash
 	CALL create_transaction(transaction_date_p, -1*number_shares_p, symbol_p, account_id_p);
-
+	CALL create_transaction(transaction_date_p, investment_total_cost, "CASH", account_id_p);
 END $$
 DELIMITER ;
+
+-- todo? Sarah to make sell_investment_by_dollar() which calls sell_investment_shares
 
 DELIMITER $$
 CREATE PROCEDURE create_account(
