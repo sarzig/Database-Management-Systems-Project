@@ -118,30 +118,6 @@ class jsFinance:
         self.family = None  # IF self.user is not Admin (is a specific user), this holds the family information
 
         # Define dictionary of program commands
-        """
-        self.command_dict = {
-            "help": {"command": self.help_command,
-                     "user": True,
-                     "Admin": True},
-            "exit": self.exit_program,
-            "view my account details": self.view_account_details_for_user,
-            "select user": self.select_user,
-            "admin mode": self.enter_admin_mode,
-            "view my goals": self.view_goals_for_user,
-            "view my family detailed": self.view_accounts_details_for_family,
-            "view my family summary": self.view_accounts_details_for_family_by_type,
-            "create family": self.create_family,
-            "create user": self.create_user,
-            "view all families": self.view_all_families,
-            "view all users": self.view_all_users,
-            "view all accounts": self.view_all_accounts,
-            "view all goals": self.view_all_goals,
-            "view all holdings": self.view_all_holdings,
-            "view all investments": self.view_all_investments,
-            "view my transactions": self.view_user_transactions,
-            "clear": self.clear_screen
-        }
-        """
         self.command_dict = {}
 
         self.command_dict["help"] = {
