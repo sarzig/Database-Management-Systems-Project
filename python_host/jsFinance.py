@@ -717,8 +717,7 @@ class jsFinance:
             # If deletion was a success, print a message and update the session details
             if result == 200:
                 print("Successfully deleted user.")
-                self.user = "Admin"
-                self.family = None
+                self.enter_admin_mode()
 
     def view_all_families(self):
         """

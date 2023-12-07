@@ -72,13 +72,15 @@ CREATE TABLE transactions (
     transaction_date DATE,
     number_shares FLOAT,
     
+    -- blocks symbol from being deleted if it was used in any transactions
     symbol VARCHAR(10),
 	CONSTRAINT fk_symbol_transactions FOREIGN KEY (symbol) REFERENCES investments(symbol) 
     ON UPDATE CASCADE ON DELETE RESTRICT,
     
+    -- if account_id is deleted, then delete associated transactions
     account_id INT,
 	CONSTRAINT fk_account_id_transactions FOREIGN KEY (account_id) REFERENCES accounts(account_id) 
-    ON UPDATE CASCADE ON DELETE RESTRICT,
+    ON UPDATE CASCADE ON DELETE CASCADE,
 
     value_transacted_at DECIMAL(13, 2)
 );
