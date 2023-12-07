@@ -52,7 +52,7 @@ def print_troubleshoot(item_to_print: str):
     :param item_to_print: item to print if troubleshooting is activated
     """
     if troubleshoot:
-        print("Troubleshoot purposes only:" + item_to_print)
+        print("Troubleshoot purposes only:" + str(item_to_print))
 
 
 # Section: static methods
@@ -178,6 +178,11 @@ class jsFinance:
             "user": False,
             "Admin": True
         }
+        self.command_dict["delete my entire account"] = {
+            "command": self.delete_user,
+            "user": True,
+            "Admin": False
+        }
         self.command_dict["view all goals"] = {
             "command": self.view_all_goals,
             "user": False,
@@ -208,7 +213,7 @@ class jsFinance:
             "user": True,
             "Admin": False
         }
-        self.command_dict["view my family detailed"] = {
+        self.command_dict["view my family accounts"] = {
             "command": self.view_accounts_details_for_family,
             "user": True,
             "Admin": False
@@ -503,6 +508,20 @@ class jsFinance:
                 print("There is nothing to show for that request.")
                 return None
 
+        elif result_expectation == "string":
+            if sql_result_output:
+                print_troubleshoot(sql_result_output)
+                first_dict = sql_result_output[0]
+                key, value = next(iter(first_dict.items()))
+                if isinstance(value, str):
+                    return value
+                else:
+                    print("Error in parse result: expected string.")
+                    return None
+            else:
+                print("There is nothing to show for that request.")
+                return None
+
         # otherwise, print an error statement
         else:
             print("Error in parse_result: unknown result_expectation.")
@@ -571,7 +590,7 @@ class jsFinance:
 
         # Execute the sql code and then parse the results
         cursor_output = self.sql_helper(prompt, input_requirements)
-        first_name = self.parse_result("single number", cursor_output)
+        first_name = self.parse_result("string", cursor_output)
 
         print_troubleshoot(f"first_name was found to be {first_name}")  # todo remove troubleshoot
 
@@ -589,16 +608,14 @@ class jsFinance:
         """
         prompt = "CALL update_user_family"
         input_requirements = [
-            {"user_input": None, "data": new_family_id, "data_type": "number"},
-            {"user_input": None, "data": self.user, "data_type": "number"}
+            {"user_input": None, "data": self.user, "data_type": "number"},
+            {"user_input": None, "data": new_family_id, "data_type": "number"}
         ]
 
         # Execute the sql code
-        try:
-            cursor_output = self.sql_helper(prompt, input_requirements)
-            self.family = cursor_output
-        except Exception as e:
-            print(f"Error: {str(e)}")
+        cursor_output = self.sql_helper(prompt, input_requirements)
+        print_troubleshoot(cursor_output)
+        print_troubleshoot(self.parse_result("single number", cursor_output))
 
     def create_user(self):
         """
@@ -679,6 +696,29 @@ class jsFinance:
         if self.user != "Admin":
             self.family = family_id
             self.update_user_family(family_id)
+
+    def delete_user(self):
+        """
+        Deletes the current user.
+        """
+
+        # Prompt user to enter y if they want to delete
+        are_you_sure = input('Are you sure you want to delete your entire account? Enter "y" to continue:')
+        if are_you_sure.lower().strip() == "y":
+            prompt = f"CALL delete_user"
+            input_requirements = [
+                {"user_input": None, "data": self.user, "data_type": "number"}
+            ]
+
+            # Execute the sql code
+            cursor_output = self.sql_helper(prompt, input_requirements)
+            result = self.parse_result("single number", cursor_output)
+
+            # If deletion was a success, print a message and update the session details
+            if result == 200:
+                print("Successfully deleted user.")
+                self.user = "Admin"
+                self.family = None
 
     def view_all_families(self):
         """

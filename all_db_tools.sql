@@ -166,7 +166,7 @@ BEGIN
     VALUES (id_at_institution_p, institution_name_p, account_nickname_p, account_type_p, user_id_p, goal_id_p);
     
     -- Success code
-	SELECT 'Success' AS result;
+	SELECT 200 AS result;
 END $$
 DELIMITER ;
 
@@ -233,7 +233,7 @@ BEGIN
     VALUES (goal_name_p, goal_amount_p, user_id_p);
 
     -- Success code
-	SELECT 'Success' AS result;
+	SELECT 200 AS result;
 END $$
 DELIMITER ;
 
@@ -380,7 +380,7 @@ BEGIN
     DELETE FROM accounts WHERE account_nickname = account_nickname_p AND user_id = user_id_p;
     
     -- Success code
-	SELECT 'Success' AS result;
+	SELECT 200 AS result;
 END $$
 DELIMITER ;
 
@@ -402,7 +402,7 @@ BEGIN
 	DELETE FROM families WHERE family_id = family_id_p;
     
     -- Success code
-	SELECT 'Success' AS result;
+	SELECT 200 AS result;
 END $$
 DELIMITER ;
 
@@ -430,7 +430,7 @@ BEGIN
 	DELETE FROM goals WHERE goal_name = goal_name_p AND user_id = user_id_p;
     
     -- Success code
-	SELECT 'Success' AS result;
+	SELECT 200 AS result;
 END $$
 DELIMITER ;
 
@@ -452,7 +452,7 @@ BEGIN
 	DELETE FROM users WHERE user_id = user_id_p;
     
     -- Success code
-	SELECT 'Success' AS result;
+	SELECT 200 AS result;
 END $$
 DELIMITER ;
 
@@ -530,7 +530,7 @@ BEGIN
 	UPDATE goals SET goal_amount = new_goal_amount_p WHERE user_id = user_id_p AND goal_name = goal_name_p;
     
     -- Success code
-	SELECT 'Success' AS result;
+	SELECT 200 AS result;
 END $$
 DELIMITER ;
 
@@ -577,7 +577,7 @@ BEGIN
 	UPDATE goals SET goal_name = new_goal_name_p WHERE user_id = user_id_p AND goal_name = old_goal_name_p;
     
     -- Success code
-	SELECT 'Success' AS result;
+	SELECT 200 AS result;
 END $$
 DELIMITER ;
 
@@ -651,7 +651,7 @@ BEGIN
 	UPDATE users set family_id = family_id_p where user_id = user_id_p;
     
     -- Success code
-	SELECT 'Success' AS result;
+	SELECT 200 AS result;
 END $$
 DELIMITER ;
 
@@ -683,7 +683,7 @@ BEGIN
 	SELECT 
 		accounts.account_nickname AS "Account Name",
 		accounts.account_type AS "Account Type",
-		CONCAT('$ ', FORMAT(SUM(number_shares * daily_value), 2)) AS "Account Value"
+		CONCAT('$ ', FORMAT(SUM(number_shares * daily_value), 2), 0) AS "Account Value"
 	FROM holdings 
 	JOIN investments ON holdings.symbol = investments.symbol 
 	JOIN accounts ON holdings.account_id = accounts.account_id
@@ -712,21 +712,21 @@ BEGIN
     
 	-- Execute view -------------------------------------------------------------------------------------------   
 	SELECT 
-    CONCAT('$ ', FORMAT(SUM(
+    CONCAT('$ ', FORMAT(COALESCE(SUM(
 		CASE WHEN accounts.account_type != 'loan' THEN number_shares * daily_value 
              ELSE 0 
         END
-        ), 2)) AS "Total Assets",
-    CONCAT('$ ', FORMAT(SUM(
+        ), 0), 2)) AS "Total Assets",
+    CONCAT('$ ', FORMAT(COALESCE(SUM(
 		CASE WHEN accounts.account_type = 'loan' THEN number_shares * daily_value 
              ELSE 0 
         END
-        ), 2)) AS "Total Debts",
-    CONCAT('$ ', FORMAT(SUM(
+        ), 0), 2)) AS "Total Debts",
+    CONCAT('$ ', FORMAT(COALESCE(SUM(
 		CASE WHEN accounts.account_type = 'loan' THEN -1 * (number_shares * daily_value) 
              ELSE number_shares * daily_value 
         END
-        ), 2)) AS "Net Worth"
+        ), 0), 2)) AS "Net Worth"
     FROM holdings 
     JOIN investments ON holdings.symbol = investments.symbol 
     JOIN accounts ON holdings.account_id = accounts.account_id

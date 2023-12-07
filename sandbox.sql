@@ -7,9 +7,10 @@ CALL create_goal('my goalie', 100, 1);
 
 CALL create_investment("FB", "FABECOK", 20.62);
 CALL update_stock_daily_value("FB", 20000);
-
+use jsfinance;
 SELECT * FROM users;
 SELECT * FROM families;
+select * from accounts;
 
 CALL view_accounts_details_for_user(1);
 

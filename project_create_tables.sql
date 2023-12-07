@@ -91,9 +91,10 @@ CREATE TABLE holdings (
 	CONSTRAINT fk_symbol_holdings FOREIGN KEY (symbol) REFERENCES investments(symbol) 
     ON UPDATE CASCADE ON DELETE RESTRICT,
     
+    -- if account_id is deleted, then delete holdings
     account_id INT,
 	CONSTRAINT fk_account_id_holdings FOREIGN KEY (account_id) REFERENCES accounts(account_id) 
-    ON UPDATE CASCADE ON DELETE RESTRICT,
+    ON UPDATE CASCADE ON DELETE CASCADE,
 
     CONSTRAINT holdings_shares_cant_be_negative CHECK (number_shares >= 0)
 );
