@@ -707,7 +707,7 @@ class jsFinance:
         # Execute the sql code
         cursor_output = self.sql_helper(prompt, input_requirements)
 
-        result = self.parse_result(cursor_output)
+        result = self.parse_result("single number", cursor_output)
 
         if result == 200:
             print("Successfully created account.")
@@ -855,14 +855,14 @@ class jsFinance:
         # Determine if buying or selling - exit function if neither
         buy_or_sell = input('Enter type of trade ("buy" or "sell"):').lower().strip()
         if buy_or_sell != "buy" and buy_or_sell != "sell":
-            print(f'Unknown trade type was entered ({buy_or_sell}).')
-            pass
+            print(f'Unknown trade type was entered ("{buy_or_sell}").')
+            return
 
         # Determine trade type (by share or amount) - exit function if neither
         trade_type = input('Enter trade method ("share" or "amount"):').lower().strip()
         if trade_type != "share" and trade_type != "amount":
-            print(f'Unknown trade type was entered ({trade_type}).')
-            pass
+            print(f'Unknown trade type was entered ("{trade_type}").')
+            return
 
         # Determine today's date
         transaction_date = datetime.datetime.today().strftime("%Y-%m-%d")

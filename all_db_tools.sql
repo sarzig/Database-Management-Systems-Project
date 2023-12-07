@@ -215,10 +215,10 @@ DELIMITER $$
 CREATE PROCEDURE sell_investment_by_share_account_nickname(
 IN transaction_date_p VARCHAR(50), IN account_nickname_p VARCHAR(100), IN user_id_p INT, IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
 BEGIN
-	DECLARE account_id_result INT;
-    
-	-- Find the account id
-    SELECT account_id INTO account_id_result FROM accounts where account_nickname = account_nickname_p AND user_id = user_id_p;
+	DECLARE account_id_p INT;
+
+	-- Find the account id    
+    SELECT get_account_id_from_user_id_and_account_nickname(user_id_p, account_nickname_p) INTO account_id_p;
     
     -- call the function
     CALL sell_investment_by_share(transaction_date_p, account_id_p, number_shares_p, symbol_p);
@@ -232,10 +232,10 @@ DELIMITER $$
 CREATE PROCEDURE sell_investment_by_amount_account_nickname(
 IN transaction_date_p VARCHAR(50), IN account_nickname_p VARCHAR(100), IN user_id_p INT, IN dollars_p FLOAT, IN symbol_p VARCHAR(10))
 BEGIN
-	DECLARE account_id_result INT;
-    
-	-- Find the account id
-    SELECT account_id INTO account_id_result FROM accounts where account_nickname = account_nickname_p AND user_id = user_id_p;
+	DECLARE account_id_p INT;
+
+	-- Find the account id    
+    SELECT get_account_id_from_user_id_and_account_nickname(user_id_p, account_nickname_p) INTO account_id_p;
     
     -- call the function
     CALL sell_investment_by_amount(transaction_date_p, account_id_p, dollars_p, symbol_p);
@@ -247,12 +247,12 @@ DELIMITER ;
 
 DELIMITER $$
 CREATE PROCEDURE buy_investment_by_share_account_nickname(
-IN transaction_date_p VARCHAR(50), IN account_nickname VARCHAR(100), IN user_id_p INT, IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
+IN transaction_date_p VARCHAR(50), IN account_nickname_p VARCHAR(100), IN user_id_p INT, IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
 BEGIN
-	DECLARE account_id_result INT;
-    
-	-- Find the account id
-    SELECT account_id INTO account_id_result FROM accounts where account_nickname = account_nickname_p AND user_id = user_id_p;
+	DECLARE account_id_p INT;
+
+	-- Find the account id    
+    SELECT get_account_id_from_user_id_and_account_nickname(user_id_p, account_nickname_p) INTO account_id_p;
     
     -- call the function
     CALL buy_investment_by_share(transaction_date_p, account_id_p, number_shares_p, symbol_p);
@@ -264,13 +264,13 @@ DELIMITER ;
 
 DELIMITER $$
 CREATE PROCEDURE buy_investment_by_amount_account_nickname(
-IN transaction_date_p VARCHAR(50), IN account_nickname VARCHAR(100),  IN user_id_p INT, IN dollars_p FLOAT, IN symbol_p VARCHAR(10))
+IN transaction_date_p VARCHAR(50), IN account_nickname_p VARCHAR(100), IN user_id_p INT, IN dollars_p FLOAT, IN symbol_p VARCHAR(10))
 BEGIN
 	-- wrapper for buy_investment_shares_by_dollar that let's input be account_nickname and user_id
-	DECLARE account_id_result INT;
-    
-	-- Find the account id
-    SELECT account_id INTO account_id_result FROM accounts where account_nickname = account_nickname_p AND user_id = user_id_p;
+	DECLARE account_id_p INT;
+
+	-- Find the account id    
+    SELECT get_account_id_from_user_id_and_account_nickname(user_id_p, account_nickname_p) INTO account_id_p;
     
     -- call the function
     CALL buy_investment_by_amount(transaction_date_p, account_id_p, dollars_p, symbol_p);
