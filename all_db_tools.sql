@@ -1,21 +1,5 @@
 DELIMITER $$
-CREATE PROCEDURE deposit_money(IN transaction_date_p VARCHAR(50), IN account_id_p INT, IN amount_p FLOAT)
-BEGIN
-    -- deposits money into an account given an account id
-	-- Error Handling -------------------------------------------------------------------------------------------   
-    -- Make sure account exists  
-    IF (SELECT COUNT(*) FROM accounts WHERE account_id = account_id_p) = 0 THEN
-		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "Account does not exist.";
-    END IF;
-    
-    -- make the transaction
-    CALL create_transaction(transaction_date_p, amount_p, "CASH", account_id_p);
-    
-END $$
-DELIMITER ;
-
-DELIMITER $$
-CREATE FUNCTION get_account_id_from_user_id_and_account_nickname(user_id_p VARCHAR(100), account_nickname_p VARCHAR(100))
+CREATE FUNCTION get_account_id_from_user_id_and_account_nickname(user_id_p INT, account_nickname_p VARCHAR(100))
 RETURNS INT
 DETERMINISTIC CONTAINS SQL
 BEGIN
@@ -46,16 +30,18 @@ END $$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE deposit_money_by_account_name(IN transaction_date_p VARCHAR(50), IN account_nickname_p VARCHAR(100), IN user_id_p VARCHAR(100), IN amount_p FLOAT)
+CREATE PROCEDURE deposit_money(IN transaction_date_p VARCHAR(50), IN account_id_p INT, IN amount_p FLOAT)
 BEGIN
-    -- deposits money into an account given a user_id and an account nickname
-    DECLARE account_id_p INT;
-	
-    -- Find the account_id_p (error handlin occurs in the function get_account_id_from_user_id_and_account_nickname)
-	SELECT get_account_id_from_user_id_and_account_nickname(user_id_p, account_nickname_p) INTO account_id_p;
-
+    -- deposits money into an account given an account id
+	-- Error Handling -------------------------------------------------------------------------------------------   
+    -- Make sure account exists  
+    IF (SELECT COUNT(*) FROM accounts WHERE account_id = account_id_p) = 0 THEN
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "Account does not exist.";
+    END IF;
+    
     -- make the transaction
-    CALL deposit_money(transaction_date_p, account_id_p, amount_p);
+    CALL create_transaction(transaction_date_p, amount_p, "CASH", account_id_p);
+    
 END $$
 DELIMITER ;
 
@@ -76,7 +62,38 @@ END $$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE buy_investment_shares(IN transaction_date_p VARCHAR(50), IN account_id_p INT, IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
+CREATE PROCEDURE deposit_money_by_account_name(
+IN transaction_date_p VARCHAR(50), IN account_nickname_p VARCHAR(100), IN user_id_p INT, IN amount_p FLOAT)
+BEGIN
+    -- deposits money into an account given a user_id and an account nickname
+    DECLARE account_id_p INT;
+	
+    -- Find the account_id_p (error handlin occurs in the function get_account_id_from_user_id_and_account_nickname)
+	SELECT get_account_id_from_user_id_and_account_nickname(user_id_p, account_nickname_p) INTO account_id_p;
+
+    -- make the transaction
+    CALL deposit_money(transaction_date_p, account_id_p, amount_p);
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE take_loan_by_account_name(
+IN transaction_date_p VARCHAR(50), IN account_nickname_p VARCHAR(100), IN user_id_p INT, IN amount_p FLOAT)
+BEGIN
+    -- deposits money into an account given a user_id and an account nickname
+    DECLARE account_id_p INT;
+	
+    -- Find the account_id_p (error handlin occurs in the function get_account_id_from_user_id_and_account_nickname)
+	SELECT get_account_id_from_user_id_and_account_nickname(user_id_p, account_nickname_p) INTO account_id_p;
+
+    -- make the transaction
+    CALL take_loan(transaction_date_p, account_id_p, amount_p);
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE buy_investment_shares_by_share(
+IN transaction_date_p VARCHAR(50), IN account_id_p INT, IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
 BEGIN
     -- takes CASH from the specified account and buys stock
 	DECLARE investment_daily_value FLOAT;
@@ -110,7 +127,25 @@ END $$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE sell_investment_shares(IN transaction_date_p VARCHAR(50), IN account_id_p INT, IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
+CREATE PROCEDURE buy_investment_shares_by_dollar(
+IN transaction_date_p VARCHAR(50), IN account_id_p INT, IN dollars_p FLOAT, IN symbol_p VARCHAR(10))
+BEGIN
+	-- Executes a trade with the given dollar amount 
+    DECLARE number_shares_p FLOAT;
+    
+    -- number shares = dollars/daily value
+    SELECT dollars_p/daily_value INTO number_shares_p FROM investments WHERE symbol = symbol_p;
+    
+    -- execute the trade by calling buy_investment_shares_by_share
+    CALL buy_investment_shares_by_share(transaction_date_p, account_id_p, number_shares_p, symbol_p);
+    
+END $$
+DELIMITER ;
+
+
+DELIMITER $$
+CREATE PROCEDURE sell_investment_shares_by_share(
+IN transaction_date_p VARCHAR(50), IN account_id_p INT, IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
 BEGIN
 -- sells stock for CASH
 	DECLARE investment_daily_value FLOAT;
@@ -132,7 +167,7 @@ BEGIN
     FROM holdings 
     WHERE account_id = account_id_p AND symbol = symbol_p;
 	
-    IF shares_in_account < number_shares_p THEN
+    IF shares_in_account < number_shares_p OR shares_in_account IS NULL THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "Not enough shares of investment are in the account.";
     END IF;
     
@@ -142,7 +177,82 @@ BEGIN
 END $$
 DELIMITER ;
 
--- todo? Sarah to make sell_investment_by_dollar() which calls sell_investment_shares
+DELIMITER $$
+CREATE PROCEDURE sell_investment_shares_by_dollar(
+IN transaction_date_p VARCHAR(50), IN account_id_p INT, IN dollars_p FLOAT, IN symbol_p VARCHAR(10))
+BEGIN
+	-- Executes a trade with the given dollar amount 
+    DECLARE number_shares_p FLOAT;
+    
+    -- number shares = dollars/daily value
+    SELECT dollars_p/daily_value INTO number_shares_p FROM investments WHERE symbol = symbol_p;
+    
+    -- execute the trade by calling sell_investment_shares_by_share
+    CALL sell_investment_shares_by_share(transaction_date_p, account_id_p, number_shares_p, symbol_p);
+    
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE sell_investment_shares_by_share_account_nickname(
+IN transaction_date_p VARCHAR(50), IN account_nickname_p VARCHAR(100), IN user_id_p INT, IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
+BEGIN
+	DECLARE account_id_result INT;
+    
+	-- Find the account id
+    SELECT account_id INTO account_id_result FROM accounts where account_nickname = account_nickname_p AND user_id = user_id_p;
+    
+    -- call the function
+    CALL sell_investment_shares_by_share(transaction_date_p, account_id_p, number_shares_p, symbol_p);
+    
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE sell_investment_shares_by_dollar_account_nickname(
+IN transaction_date_p VARCHAR(50), IN account_nickname_p VARCHAR(100), IN user_id_p INT, IN dollars_p FLOAT, IN symbol_p VARCHAR(10))
+BEGIN
+	DECLARE account_id_result INT;
+    
+	-- Find the account id
+    SELECT account_id INTO account_id_result FROM accounts where account_nickname = account_nickname_p AND user_id = user_id_p;
+    
+    -- call the function
+    CALL sell_investment_shares_by_dollar(transaction_date_p, account_id_p, dollars_p, symbol_p);
+    
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE buy_investment_shares_by_share_account_nickname(
+IN transaction_date_p VARCHAR(50), IN account_nickname VARCHAR(100), IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
+BEGIN
+	DECLARE account_id_result INT;
+    
+	-- Find the account id
+    SELECT account_id INTO account_id_result FROM accounts where account_nickname = account_nickname_p AND user_id = user_id_p;
+    
+    -- call the function
+    CALL buy_investment_shares_by_share(transaction_date_p, account_id_p, number_shares_p, symbol_p);
+    
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE buy_investment_shares_by_dollar_account_nickname(
+IN transaction_date_p VARCHAR(50), IN account_nickname VARCHAR(100), IN dollars_p FLOAT, IN symbol_p VARCHAR(10))
+BEGIN
+	-- wrapper for buy_investment_shares_by_dollar that let's input be account_nickname and user_id
+	DECLARE account_id_result INT;
+    
+	-- Find the account id
+    SELECT account_id INTO account_id_result FROM accounts where account_nickname = account_nickname_p AND user_id = user_id_p;
+    
+    -- call the function
+    CALL buy_investment_shares_by_dollar(transaction_date_p, account_id_p, dollars_p, symbol_p);
+    
+END $$
+DELIMITER ;
 
 DELIMITER $$
 CREATE PROCEDURE create_account(
