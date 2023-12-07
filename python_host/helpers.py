@@ -11,6 +11,7 @@ import pandas as pd
 import pymysql
 from tabulate import tabulate
 
+
 def pretty_print_sql_results_table(sql_result_table):
     """
     Given a sql result table, this function formats the table in a more aesthetically pleasing way.
@@ -57,7 +58,7 @@ def connect_to_sql_database(authentication_dict: dict):
     try:
         conn = pymysql.connect(
             host=authentication_dict["host"],
-            user=authentication_dict["user"],
+            user=authentication_dict["username"],
             password=authentication_dict["password"],
             database="jsfinance",
             cursorclass=pymysql.cursors.DictCursor)

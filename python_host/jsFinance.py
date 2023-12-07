@@ -17,8 +17,7 @@ todo: yfinance implementation in jsFinance class. I'm thinking that we MANUALLY 
       
 
 Pre turn-in priorities__________________________________________________________________________________________
-todo: ping database right after creating self.connection object to ensure we have communication. display success
-      message to user.
+
 todo: update report (can we front load / get this out of the way on wednesday?)
 todo: figure out how to make this work for a no-password mysql
 todo: test building code on sarah's work machine
@@ -111,6 +110,10 @@ class jsFinance:
         else:
             self.connection = connect_via_command_line_input()
 
+        # If connection could not be established, exit program
+        if not self.connection:
+            self.exit_program()
+
         self.cursor = self.connection.cursor()
         self.user = "Admin"  # tracks current user role
         self.first_name = "Admin"  # tracks current username
@@ -118,164 +121,223 @@ class jsFinance:
 
         # Define dictionary of program commands
         self.command_dict = {}
+        self.command_table = {}
+        self.define_command_dict()
+
+    def define_command_dict(self):
         self.command_dict["help"] = {
             "command": self.help_command,
             "user": True,
-            "Admin": True
+            "Admin": True,
+            "category": "General"
         }
         self.command_dict["exit"] = {
             "command": self.exit_program,
             "user": True,
-            "Admin": True
+            "Admin": True,
+            "category": "General"
         }
         self.command_dict["clear"] = {
             "command": self.clear_screen,
             "user": True,
-            "Admin": True
+            "Admin": True,
+            "category": "General"
         }
         self.command_dict["view my accounts"] = {
             "command": self.view_account_details_for_user,
             "user": True,
-            "Admin": False
+            "Admin": False,
+            "category": "View"
         }
         self.command_dict["select user"] = {
             "command": self.select_user,
             "user": True,
-            "Admin": True
+            "Admin": True,
+            "category": "General"
         }
         self.command_dict["admin mode"] = {
             "command": self.enter_admin_mode,
             "user": True,
-            "Admin": True
+            "Admin": False,
+            "category": "General"
         }
         self.command_dict["create user"] = {
             "command": self.create_user,
             "user": False,
-            "Admin": True
+            "Admin": True,
+            "category": "Modify"
         }
         self.command_dict["create account"] = {
             "command": self.create_account,
             "user": True,
-            "Admin": True
+            "Admin": True,
+            "category": "Modify"
         }
         self.command_dict["create family"] = {
             "command": self.create_family,
             "user": True,
-            "Admin": True
+            "Admin": True,
+            "category": "Modify"
         }
         self.command_dict["create goal"] = {
             "command": self.create_goal,
             "user": True,
-            "Admin": False
+            "Admin": False,
+            "category": "Modify"
         }
         self.command_dict["update my family"] = {
             "command": self.update_my_family,
             "user": True,
-            "Admin": False
+            "Admin": False,
+            "category": "Modify"
         }
         self.command_dict["deposit money"] = {
             "command": self.deposit_money,
             "user": True,
-            "Admin": False
+            "Admin": False,
+            "category": "Transact"
         }
         self.command_dict["take out loan"] = {
             "command": self.take_out_loan,
             "user": True,
-            "Admin": False
+            "Admin": False,
+            "category": "Transact"
         }
         self.command_dict["place trade"] = {
             "command": self.place_trade,
             "user": True,
-            "Admin": False
+            "Admin": False,
+            "category": "Transact"
         }
         self.command_dict["view all families"] = {
             "command": self.view_all_families,
             "user": False,
-            "Admin": True
+            "Admin": True,
+            "category": "View"
         }
         self.command_dict["view all users"] = {
             "command": self.view_all_users,
             "user": False,
-            "Admin": True
+            "Admin": True,
+            "category": "View"
         }
         self.command_dict["view all accounts"] = {
             "command": self.view_all_accounts,
             "user": False,
-            "Admin": True
+            "Admin": True,
+            "category": "View"
         }
         self.command_dict["delete my goal"] = {
             "command": self.delete_goal,
             "user": True,
-            "Admin": False
+            "Admin": False,
+            "category": "Modify"
         }
         self.command_dict["delete my entire account"] = {
             "command": self.delete_user,
             "user": True,
-            "Admin": False
+            "Admin": False,
+            "category": "Modify"
         }
         self.command_dict["delete my family"] = {
             "command": self.delete_family,
             "user": True,
-            "Admin": False
+            "Admin": False,
+            "category": "Modify"
         }
         self.command_dict["remove myself from family"] = {
             "command": self.update_my_family_to_null,
             "user": True,
-            "Admin": False
+            "Admin": False,
+            "category": "Modify"
         }
         self.command_dict["view all goals"] = {
             "command": self.view_all_goals,
             "user": False,
-            "Admin": True
+            "Admin": True,
+            "category": "View"
         }
         self.command_dict["view all holdings"] = {
             "command": self.view_all_holdings,
             "user": False,
-            "Admin": True
+            "Admin": True,
+            "category": "View"
         }
         self.command_dict["view all transactions"] = {
             "command": self.view_all_transactions,
             "user": False,
-            "Admin": True
+            "Admin": True,
+            "category": "View"
         }
         self.command_dict["view all investments"] = {
             "command": self.view_all_investments,
             "user": True,
-            "Admin": True
+            "Admin": True,
+            "category": "View"
         }
         self.command_dict["view my transactions"] = {
             "command": self.view_user_transactions,
             "user": True,
-            "Admin": False
+            "Admin": False,
+            "category": "View"
         }
         self.command_dict["view my goals"] = {
             "command": self.view_goals_for_user,
             "user": True,
-            "Admin": False
+            "Admin": False,
+            "category": "View"
         }
         self.command_dict["view my family accounts"] = {
             "command": self.view_accounts_details_for_family,
             "user": True,
-            "Admin": False
+            "Admin": False,
+            "category": "View"
         }
         self.command_dict["view my family summary"] = {
             "command": self.view_accounts_details_for_family_by_type,
             "user": True,
-            "Admin": False
+            "Admin": False,
+            "category": "View"
         }
         self.command_dict["view my holdings"] = {
             "command": self.view_my_stock_holdings,
             "user": True,
-            "Admin": False
+            "Admin": False,
+            "category": "View"
         }
 
-        # Build out menu options based on self.command_dict
-        user_commands = [command for command, details in self.command_dict.items() if details.get("user", False)]
-        admin_commands = [command for command, details in self.command_dict.items() if details.get("Admin", False)]
-        user_commands_menu = "User options are:\n    * " + "\n    * ".join(user_commands)
-        admin_commands_menu = "Admin options are:\n    * " + "\n    * ".join(admin_commands)
+        # Build out menu options based on command_dict
+        command_list = {"user": {"General": [], "View": [], "Modify": [], "Transact": []},
+                        "Admin": {"General": [], "View": [], "Modify": [], "Transact": []}}
 
-        self.command_list = {"Admin": admin_commands_menu, "User": user_commands_menu}
+        # Populate the menu with the keys that match the user type
+        for user_type in ["user", "Admin"]:
+            for key in self.command_dict:
+                if self.command_dict[key][user_type]:
+                    command_list[user_type][self.command_dict[key]["category"]].append(key)
+
+        # Create DataFrames for user and admin
+        user_df = pd.DataFrame()
+        admin_df = pd.DataFrame()
+
+        # Iterate across user types
+        for user_type in ["user", "Admin"]:
+            # Iterate across category types
+            for category in ["General", "View", "Modify", "Transact"]:
+                # Get list of commands of that category for that user type
+                commands = command_list[user_type][category]
+
+                # Put into temporary df object
+                temporary_command_df = pd.DataFrame({f"{category}": commands})
+
+                if user_type == "Admin":
+                    admin_df = pd.concat([admin_df, temporary_command_df], axis=1).fillna('')
+                elif user_type == "user":
+                    user_df = pd.concat([user_df, temporary_command_df], axis=1).fillna('')
+
+        # Finally, store in
+        self.command_table["Admin"] = admin_df
+        self.command_table["user"] = user_df
 
     @staticmethod
     def welcome_message():
@@ -327,12 +389,12 @@ class jsFinance:
         """
         Commits changes to database, closes database connection, prints message to user, and then exits the CLI.
         """
+        if self.connection:
+            # Commit changes to database
+            self.commit_to_database()
 
-        # Commit changes to database
-        self.commit_to_database()
-
-        # Close database connection
-        self.close_connection()
+            # Close database connection
+            self.close_connection()
 
         # Print helpful message
         print("+----------------------------------------------------------------------------------------------------+")
@@ -376,9 +438,9 @@ class jsFinance:
         Prints allowed commands at that point in the CLI program.
         """
         if self.user == "Admin":
-            print(self.command_list["Admin"])
+            print(tabulate(self.command_table["Admin"], headers='keys', tablefmt='heavy_outline', showindex=False))
         else:
-            print(self.command_list["User"])
+            print(tabulate(self.command_table["user"], headers='keys', tablefmt='heavy_outline', showindex=False))
 
     def execute_input(self, user_input: str):
         """
