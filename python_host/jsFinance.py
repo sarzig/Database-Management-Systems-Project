@@ -42,66 +42,35 @@ import os
 
 # todo: delete troubleshooting var at end
 global troubleshoot
-troubleshoot = True
-
-
-def print_troubleshoot(item_to_print: str):
-    """
-    Helper method to delete later. todo: delete.
-    :param item_to_print: item to print if troubleshooting is activated
-    """
-    if troubleshoot:
-        print("Troubleshoot purposes only:" + str(item_to_print))
-
-
-# Section: static methods
-
-def connect_via_command_line_input():
-    """
-    Prompts user for their username and password. Attempts to connect to that
-    database using connect_to_sql_database() function.
-
-    :return: Object of type <class 'mysql.connector.connection.MySQLConnection'> if successful.
-             Otherwise, returns None if connection was unsuccessful.
-    """
-
-    # Prompt user for inputs and strip whitespace
-    host = input("Enter database host (often 'localhost'): ").strip()
-    username = input("Enter database username (often 'root'): ").strip()
-    password = input("Enter database password: ").strip()
-    authentication_dict = {"host": host, "username": username, "password": password}
-
-    # Attempt connection via connect_to_sql_database and then check validity of the result
-    database = connect_to_sql_database(authentication_dict)
-    connection_was_successful = isinstance(database, pymysql.connections.Connection)
-
-    if connection_was_successful:
-        print(f'Successfully connected to database "jsfinance".')
-        return database
-
-    else:
-        # If fails, let user try again. Recurse until successful connection OR user stops trying
-        continue_prompting = input('You did not successfully connect. '
-                                   'Enter "y" if you want to try again. '
-                                   'Press any other key to exit:')
-        if continue_prompting.lower() == "y":
-            # User chooses to continue.
-            # If the recursive call yields a working connection, this function will return a
-            #  MySqlConnection object
-            return connect_via_command_line_input()
-        else:
-            # User doesn't want to continue -> print failure and return None
-            print(f'Exiting program. '
-                  f'Failed to connect to database "jsfinance" with username "{username}".')
-            return None
+troubleshoot = False
 
 
 class jsFinance:
     """
-    todo: add documentation
+    Class jsFinance forms the structure and attributes of a command line interface (CLI) session of
+    the personal finance tracker "jsFinance" (Joseph-Sarah Finance).
+
+    It supports connecting to the database with database credentials, and provides two user roles: user and Admin.
+    Within these two user roles, a user can act as the database administrator OR can act as an end user.
+
+    Attributes:
+        - connection:    The database connection object.
+        - cursor:        The database cursor object.
+        - user:          Contains either the user_id of the current user or the phrase "Admin".
+        - first_name:    Contains either the first_name of the current user or the phrase "Admin".
+        - family:        If a user is selected, this holds the family_id of that user. Otherwise, is None.
+        - command_dict:  Holds function objects which have keys representing user comamnds.
+        - command_table: Holds tables which are called via help() method.
     """
 
     def __init__(self, authentication_dict=None):
+        """
+        Constructor initializes a jsFinance instance. If database connection is unsuccessful, the program
+        will end during this consturctor (via the connect_via_command_line_input() function).
+
+        :param authentication_dict: optional parameter, dictionary of the form:
+                {"host": "some_hostname", "username": "some_username", "password": "some_password"
+        """
         self.welcome_message()
 
         # Connect via default connection (command line input) or via authentication dictionary
@@ -114,7 +83,10 @@ class jsFinance:
         if not self.connection:
             self.exit_program()
 
+        # Otherwise establish a cursor object
         self.cursor = self.connection.cursor()
+
+        # Define user role details
         self.user = "Admin"  # tracks current user role
         self.first_name = "Admin"  # tracks current username
         self.family = None  # IF self.user is not Admin (is a specific user), this holds the family information
@@ -125,6 +97,21 @@ class jsFinance:
         self.define_command_dict()
 
     def define_command_dict(self):
+        """
+        Builds out the self.command_dict and self.command_table. self.command_dict is the main logical feature
+        that transforms users' commands into actions.
+
+        self.command_table is the helpful table that can be shown to the user with the "help" command.
+        """
+
+        # self.command_dict is a dictionary of dictionaries.
+        #    - key:     the command the user can type to execute the action
+        # Inner dictionary contains:
+        #    - command:   the function object which executes the given command (no parameters allowed).
+        #    - user:      boolean. If True, this command is allowed for role:user.
+        #    - Admin:     boolean. If True, this command is allowed for role:Admin.
+        #    - category:  string. Stores the menu heading of that command
+
         self.command_dict["help"] = {
             "command": self.help_command,
             "user": True,
@@ -345,26 +332,6 @@ class jsFinance:
         self.command_table["Admin"] = admin_df
         self.command_table["user"] = user_df
 
-    @staticmethod
-    def welcome_message():
-        # Inform user they've entered the program
-        print("+----------------------------------------------------------------------------------------------------+")
-        print("|                                 jsFinance Personal Finance Tracker                                 |")
-        print("+----------------------------------------------------------------------------------------------------+")
-
-    def clear_screen(self):
-        """
-        Clears screen of cli based on operating system.
-        """
-        # Clear the screen based on the operating system and re-print welcome message
-        print_troubleshoot(os.name)
-        if os.name == 'nt':
-            os.system('cls')
-            self.welcome_message()
-        else:
-            os.system('clear')
-            self.welcome_message()
-
     def run(self):
         """
         This method runs the command line interface until an error occurs, or until the user quits.
@@ -385,7 +352,7 @@ class jsFinance:
 
     def enter_admin_mode(self):
         """
-        Updates self.user to "Admin"
+        Updates self.user to "Admin".
         """
         self.user = "Admin"
         self.first_name = "Admin"

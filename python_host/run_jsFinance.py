@@ -10,7 +10,7 @@ import os
 
 # todo: delete troubleshooting var at end
 global troubleshoot
-troubleshoot = True
+troubleshoot = False
 
 
 def main():

@@ -10,6 +10,51 @@ import yfinance as yf
 import pandas as pd
 import pymysql
 from tabulate import tabulate
+import os
+
+# todo delete global troubleshooting
+global troubleshoot
+troubleshoot = False
+
+
+def connect_via_command_line_input():
+    """
+    Prompts user for their username and password. Attempts to connect to that
+    database using connect_to_sql_database() function.
+
+    :return: Object of type <class 'mysql.connector.connection.MySQLConnection'> if successful.
+             Otherwise, returns None if connection was unsuccessful.
+    """
+
+    # Prompt user for inputs and strip whitespace
+    host = input("Enter database host (often 'localhost'): ").strip()
+    username = input("Enter database username (often 'root'): ").strip()
+    password = input("Enter database password: ").strip()
+    authentication_dict = {"host": host, "username": username, "password": password}
+
+    # Attempt connection via connect_to_sql_database and then check validity of the result
+    database = connect_to_sql_database(authentication_dict)
+    connection_was_successful = isinstance(database, pymysql.connections.Connection)
+
+    if connection_was_successful:
+        print(f'Successfully connected to database "jsfinance".')
+        return database
+
+    else:
+        # If fails, let user try again. Recurse until successful connection OR user stops trying
+        continue_prompting = input('You did not successfully connect. '
+                                   'Enter "y" if you want to try again. '
+                                   'Press any other key to exit:')
+        if continue_prompting.lower() == "y":
+            # User chooses to continue.
+            # If the recursive call yields a working connection, this function will return a
+            #  MySqlConnection object
+            return connect_via_command_line_input()
+        else:
+            # User doesn't want to continue -> print failure and return None
+            print(f'Exiting program. '
+                  f'Failed to connect to database "jsfinance" with username "{username}".')
+            return None
 
 
 def pretty_print_sql_results_table(sql_result_table):
@@ -25,6 +70,7 @@ def pretty_print_sql_results_table(sql_result_table):
     df.columns = [col.replace("_", " ").title().replace(" Id", " ID").replace("Id ", "ID ").
                       replace(" At ", " at ").replace(" Of ", " of").replace("(S)", '(s)') for col in df.columns]
     print(tabulate(df, headers='keys', tablefmt='pretty', showindex=False))
+
 
 def extract_error_message_from_signal(error_text: str) -> str:
     """
@@ -205,3 +251,35 @@ def get_yfinance(input_date: datetime.date) -> pd.DataFrame:
 
     # Return the dataFrame
     return sp_100
+
+
+def welcome_message():
+    """
+    Prints message to inform user they've entered the program.
+    """
+
+    print("+----------------------------------------------------------------------------------------------------+")
+    print("|                                 jsFinance Personal Finance Tracker                                 |")
+    print("+----------------------------------------------------------------------------------------------------+")
+
+
+def clear_screen(self):
+    """
+    Clears screen of cli based on operating system and re-prints welcome message.
+    """
+    print_troubleshoot(os.name)
+    if os.name == 'nt':
+        os.system('cls')
+        welcome_message()
+    else:
+        os.system('clear')
+        welcome_message()
+
+
+def print_troubleshoot(item_to_print: str):
+    """
+    Helper method to delete later. todo: delete.
+    :param item_to_print: item to print if troubleshooting is activated
+    """
+    if troubleshoot:
+        print("Troubleshoot purposes only:" + str(item_to_print))
