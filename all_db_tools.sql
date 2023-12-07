@@ -989,7 +989,7 @@ BEGIN
         CONCAT('$ ', FORMAT(COALESCE(SUM(number_shares * daily_value), 0), 2)) AS "Current Value",
         CONCAT('$ ', FORMAT(goals.goal_amount, 2)) AS "Goal Amount",
         CASE WHEN
-        (ROUND(SUM(number_shares * daily_value), 2) > goals.goal_amount) = 1
+        (ROUND(SUM(number_shares * daily_value), 2) >= ROUND(goals.goal_amount, 2)) = 1
         THEN "YES"
         ELSE "NO"
         END
@@ -1088,6 +1088,36 @@ BEGIN
     NATURAL JOIN accounts 
     NATURAL JOIN investments 
     WHERE accounts.user_id = user_id_p AND number_shares > 0
+	ORDER BY account_nickname, symbol;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE view_my_holdings_by_account(IN user_id_p INT, IN account_nickname_p VARCHAR(100))
+BEGIN
+	-- given a user id, this shows the stock holdings of all accounts
+    DECLARE user_does_not_exist INT;
+    DECLARE account_id_p INT;
+    
+	-- Check if user exists
+	SELECT COUNT(*) != 1 INTO user_does_not_exist FROM users WHERE user_id = user_id_p;
+    IF user_does_not_exist THEN
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "User ID does not exist.";
+    END IF;
+    
+    SELECT get_account_id_from_user_id_and_account_nickname(user_id_p, account_nickname_p) INTO account_id_p;
+    
+	SELECT 
+		account_nickname, 
+        account_type,
+        symbol,
+        number_shares, 
+        CONCAT("$ ", format(daily_value, 2)) AS daily_value,
+		CONCAT("$ ", format(number_shares*daily_value, 2)) AS total_value
+    FROM holdings 
+    NATURAL JOIN accounts 
+    NATURAL JOIN investments 
+    WHERE accounts.user_id = user_id_p AND number_shares > 0 AND accounts.account_id = account_id_p
 	ORDER BY account_nickname, symbol;
 END$$
 DELIMITER ;

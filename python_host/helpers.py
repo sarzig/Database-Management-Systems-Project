@@ -23,7 +23,7 @@ def pretty_print_sql_results_table(sql_result_table):
 
     # Rename columns
     df.columns = [col.replace("_", " ").title().replace(" Id", " ID").replace("Id ", "ID ").
-                      replace(" At ", " at ").replace(" Of ", " of") for col in df.columns]
+                      replace(" At ", " at ").replace(" Of ", " of").replace("(S)", '(s)') for col in df.columns]
     print(tabulate(df, headers='keys', tablefmt='pretty', showindex=False))
 
 def extract_error_message_from_signal(error_text: str) -> str:

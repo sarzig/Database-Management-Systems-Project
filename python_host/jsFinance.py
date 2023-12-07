@@ -305,6 +305,12 @@ class jsFinance:
             "Admin": False,
             "category": "View"
         }
+        self.command_dict["view my holdings by account"] = {
+            "command": self.view_my_stock_holdings_by_account,
+            "user": True,
+            "Admin": False,
+            "category": "View"
+        }
 
         # Build out menu options based on command_dict
         command_list = {"user": {"General": [], "View": [], "Modify": [], "Transact": []},
@@ -1184,3 +1190,18 @@ class jsFinance:
         # Execute the sql code and then parse the results
         cursor_output = self.sql_helper(prompt)
         self.parse_result("print table", cursor_output)
+
+    def view_my_stock_holdings_by_account(self):
+        """
+        Allows user to view the stock holdings of an account given the account nickname
+        """
+        # Define prompt
+        prompt = f"CALL view_my_holdings_by_account"
+        input_requirements = [
+            {"user_input": None, "data": self.user, "data_type": "number"},
+            {"user_input": "Provide nickname of account to view:", "data": None, "data_type": "string"}
+        ]
+
+        # Execute the sql code
+        cursor_output = self.sql_helper(prompt, input_requirements)
+        result = self.parse_result("print table", cursor_output)
