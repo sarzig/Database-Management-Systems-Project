@@ -198,6 +198,11 @@ class jsFinance:
             "user": True,
             "Admin": False
         }
+        self.command_dict["delete my family"] = {
+            "command": self.delete_family,
+            "user": True,
+            "Admin": False
+        }
         self.command_dict["remove myself from family"] = {
             "command": self.update_my_family_to_null,
             "user": True,
@@ -261,7 +266,7 @@ class jsFinance:
 
     def clear_screen(self):
         """
-        Clears screen of cli.
+        Clears screen of cli based on operating system.
         """
         # Clear the screen based on the operating system and re-print welcome message
         print_troubleshoot(os.name)
@@ -800,6 +805,25 @@ class jsFinance:
             if result == 200:
                 print("Successfully deleted user.")
                 self.enter_admin_mode()
+
+    def delete_family(self):
+        """
+        Deletes the family of the current user.
+        """
+
+        prompt = f"CALL delete_family"
+        input_requirements = [
+            {"user_input": None, "data": self.user, "data_type": "number"}
+        ]
+
+        # Execute the sql code
+        cursor_output = self.sql_helper(prompt, input_requirements)
+        result = self.parse_result("single number", cursor_output)
+
+        # If deletion was a success, print a message and update the session details
+        if result == 200:
+            print("Successfully deleted family.")
+            self.family = None
 
     def delete_goal(self):
         """

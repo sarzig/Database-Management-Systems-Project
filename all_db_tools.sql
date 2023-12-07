@@ -1,7 +1,7 @@
 DELIMITER $$
 CREATE PROCEDURE deposit_money(IN transaction_date_p VARCHAR(50), IN account_id_p INT, IN amount_p FLOAT)
 BEGIN
-    -- deposits money into an account
+    -- deposits money into an account given an account id
 	-- Error Handling -------------------------------------------------------------------------------------------   
     -- Make sure account exists  
     IF (SELECT COUNT(*) FROM accounts WHERE account_id = account_id_p) = 0 THEN
@@ -11,6 +11,51 @@ BEGIN
     -- make the transaction
     CALL create_transaction(transaction_date_p, amount_p, "CASH", account_id_p);
     
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE FUNCTION get_account_id_from_user_id_and_account_nickname(user_id_p VARCHAR(100), account_nickname_p VARCHAR(100))
+RETURNS INT
+DETERMINISTIC CONTAINS SQL
+BEGIN
+	-- given a user id and account nickname, this returns the account id
+    DECLARE user_does_not_exist INT;
+	DECLARE account_id_result INT;
+
+    
+	-- Check if user exists
+	SELECT COUNT(*) != 1 INTO user_does_not_exist FROM users WHERE user_id = user_id_p;
+    IF user_does_not_exist THEN
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "User ID does not exist.";
+    END IF;
+    
+	-- Find the account id
+    SELECT account_id INTO account_id_result FROM accounts where account_nickname = account_nickname_p AND user_id = user_id_p;
+    
+	-- Make sure account exists  
+    IF account_id_result IS NULL THEN
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "Account does not exist.";
+    END IF;
+    
+    -- Finally, return the account_id
+    
+    RETURN account_id_result;
+
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE deposit_money_by_account_name(IN transaction_date_p VARCHAR(50), IN account_nickname_p VARCHAR(100), IN user_id_p VARCHAR(100), IN amount_p FLOAT)
+BEGIN
+    -- deposits money into an account given a user_id and an account nickname
+    DECLARE account_id_p INT;
+	
+    -- Find the account_id_p (error handlin occurs in the function get_account_id_from_user_id_and_account_nickname)
+	SELECT get_account_id_from_user_id_and_account_nickname(user_id_p, account_nickname_p) INTO account_id_p;
+
+    -- make the transaction
+    CALL deposit_money(transaction_date_p, account_id_p, amount_p);
 END $$
 DELIMITER ;
 
