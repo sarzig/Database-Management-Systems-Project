@@ -888,7 +888,6 @@ BEGIN
 	
 END $$
 DELIMITER ;
-CALL 
 
 DELIMITER $$
 CREATE PROCEDURE view_all_users()

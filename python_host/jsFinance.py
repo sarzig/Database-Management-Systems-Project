@@ -178,6 +178,11 @@ class jsFinance:
             "user": False,
             "Admin": True
         }
+        self.command_dict["delete my goal"] = {
+            "command": self.delete_goal,
+            "user": True,
+            "Admin": False
+        }
         self.command_dict["delete my entire account"] = {
             "command": self.delete_user,
             "user": True,
@@ -602,7 +607,7 @@ class jsFinance:
             # todo: actual error handling or nah?
             print("Error: unknown state in automatic_first_name_update.")
 
-    def update_user_family(self, new_family_id:str):
+    def update_user_family(self, new_family_id: str):
         """
         Update's user's family to the new family ID.
         """
@@ -651,13 +656,13 @@ class jsFinance:
             user_id_request_message = None
 
         input_requirements = [
-                {"user_input": "Provide account ID at institution:", "data": None, "data_type": "string"},
-                {"user_input": "Provide institution name:", "data": None, "data_type": "string"},
-                {"user_input": "Provide account nickname:", "data": None, "data_type": "string"},
-                {"user_input": "Provide account type (loan, checkings, savings, 401(k), roth IRA, "
-                               "traditional IRA, 529, taxable brokerage):", "data": None, "data_type": "string"},
-                {"user_input": user_id_request_message, "data": user_id_input, "data_type": "number"},
-                {"user_input": None, "data": "NULL", "data_type": "number"},
+            {"user_input": "Provide account ID at institution:", "data": None, "data_type": "string"},
+            {"user_input": "Provide institution name:", "data": None, "data_type": "string"},
+            {"user_input": "Provide account nickname:", "data": None, "data_type": "string"},
+            {"user_input": "Provide account type (loan, checkings, savings, 401(k), roth IRA, "
+                           "traditional IRA, 529, taxable brokerage):", "data": None, "data_type": "string"},
+            {"user_input": user_id_request_message, "data": user_id_input, "data_type": "number"},
+            {"user_input": None, "data": "NULL", "data_type": "number"},
         ]
 
         # Execute the sql code
@@ -683,7 +688,7 @@ class jsFinance:
             # Otherwise if user has no family, create the family and then associate it with the given user
 
         input_requirements = [
-                {"user_input": "Provide family name:", "data": None, "data_type": "string"}
+            {"user_input": "Provide family name:", "data": None, "data_type": "string"}
         ]
 
         # Execute the sql code
@@ -718,6 +723,25 @@ class jsFinance:
             if result == 200:
                 print("Successfully deleted user.")
                 self.enter_admin_mode()
+
+    def delete_goal(self):
+        """
+        Deletes the specified goal.
+        """
+
+        prompt = f"CALL delete_goal"
+        input_requirements = [
+            {"user_input": "Provide name of goal to delete:", "data": None, "data_type": "string"},
+            {"user_input": None, "data": self.user, "data_type": "number"}
+        ]
+
+        # Execute the sql code
+        cursor_output = self.sql_helper(prompt, input_requirements)
+        result = self.parse_result("single number", cursor_output)
+
+        # If deletion was a success, print a message and update the session details
+        if result == 200:
+            print("Successfully deleted goal.")
 
     def view_all_families(self):
         """
