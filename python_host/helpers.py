@@ -263,7 +263,7 @@ def welcome_message():
     print("+----------------------------------------------------------------------------------------------------+")
 
 
-def clear_screen(self):
+def clear_screen():
     """
     Clears screen of cli based on operating system and re-prints welcome message.
     """
