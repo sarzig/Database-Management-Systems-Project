@@ -183,6 +183,11 @@ class jsFinance:
             "user": True,
             "Admin": False
         }
+        self.command_dict["place trade"] = {
+            "command": self.place_trade,
+            "user": True,
+            "Admin": False
+        }
         self.command_dict["view all families"] = {
             "command": self.view_all_families,
             "user": False,
@@ -255,6 +260,11 @@ class jsFinance:
         }
         self.command_dict["view my family summary"] = {
             "command": self.view_accounts_details_for_family_by_type,
+            "user": True,
+            "Admin": False
+        }
+        self.command_dict["view my holdings"] = {
+            "command": self.view_my_stock_holdings,
             "user": True,
             "Admin": False
         }
@@ -822,7 +832,6 @@ class jsFinance:
         Using the account nickname, the user can deposit money in the account.
         """
         prompt = f"CALL deposit_money_by_account_name"
-
         transaction_date = datetime.datetime.today().strftime("%Y-%m-%d")
 
         input_requirements = [
@@ -838,6 +847,52 @@ class jsFinance:
 
         if result == 200:
             print("Successfully deposited money.")
+
+    def place_trade(self):
+        """
+        Allows user to buy or sell an investment in the specified account.
+        """
+        # Determine if buying or selling - exit function if neither
+        buy_or_sell = input('Enter type of trade ("buy" or "sell"):').lower().strip()
+        if buy_or_sell != "buy" and buy_or_sell != "sell":
+            print(f'Unknown trade type was entered ({buy_or_sell}).')
+            pass
+
+        # Determine trade type (by share or amount) - exit function if neither
+        trade_type = input('Enter trade method ("share" or "amount"):').lower().strip()
+        if trade_type != "share" and trade_type != "amount":
+            print(f'Unknown trade type was entered ({trade_type}).')
+            pass
+
+        # Determine today's date
+        transaction_date = datetime.datetime.today().strftime("%Y-%m-%d")
+
+        # Determine prompt language for provide shares / provide amount
+        if trade_type == "share":
+            prompt_language = "Provide number of shares:"
+        else:
+            prompt_language = "Provide amount to trade: $"
+
+        prompt = f"CALL {buy_or_sell}_investment_by_{trade_type}_account_nickname"
+        input_requirements = [
+                {"user_input": None, "data": transaction_date, "data_type": "string"},
+                {"user_input": "Provide account nickname:", "data": None, "data_type": "string"},
+                {"user_input": None, "data": self.user, "data_type": "number"},
+                {"user_input": f"{prompt_language}", "data": None, "data_type": "number"},
+                {"user_input": "Provide symbol to trade:", "data": None, "data_type": "string"},
+            ]
+
+        # Execute the sql code
+        cursor_output = self.sql_helper(prompt, input_requirements)
+        result = self.parse_result("single number", cursor_output)
+
+        if result == 200:
+            if buy_or_sell == "buy":
+                print("Successfully purchased stock.")
+            elif buy_or_sell == "sell":
+                print("Successfully sold stock.")
+            else:
+                print("Success code but unknown state.")
 
     def delete_user(self):
         """
@@ -1000,7 +1055,7 @@ class jsFinance:
         """
         Allows user to view their goals.
         """
-        # todo: format similarly to view_accounts_details_for_user() for $ sign and $0.00
+
         # if user isn't the admin, then execute
         if self.user != "Admin":
 
@@ -1056,3 +1111,14 @@ class jsFinance:
                 print("Select a user to show family details.")
             else:
                 print("User does not have a family to show details.")
+
+    def view_my_stock_holdings(self):
+        """
+        Allows user to view the stock holdings of all their accounts
+        """
+        # Define prompt
+        prompt = f"CALL view_my_holdings({self.user})"
+
+        # Execute the sql code and then parse the results
+        cursor_output = self.sql_helper(prompt)
+        self.parse_result("print table", cursor_output)

@@ -102,7 +102,7 @@ END $$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE buy_investment_shares_by_share(
+CREATE PROCEDURE buy_investment_by_share(
 IN transaction_date_p VARCHAR(50), IN account_id_p INT, IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
 BEGIN
     -- takes CASH from the specified account and buys stock
@@ -139,7 +139,7 @@ END $$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE buy_investment_shares_by_dollar(
+CREATE PROCEDURE buy_investment_by_amount(
 IN transaction_date_p VARCHAR(50), IN account_id_p INT, IN dollars_p FLOAT, IN symbol_p VARCHAR(10))
 BEGIN
 	-- Executes a trade with the given dollar amount 
@@ -149,7 +149,7 @@ BEGIN
     SELECT dollars_p/daily_value INTO number_shares_p FROM investments WHERE symbol = symbol_p;
     
     -- execute the trade by calling buy_investment_shares_by_share
-    CALL buy_investment_shares_by_share(transaction_date_p, account_id_p, number_shares_p, symbol_p);
+    CALL buy_investment_by_share(transaction_date_p, account_id_p, number_shares_p, symbol_p);
 	
     -- Return success code
 	SELECT 200 AS result;
@@ -157,7 +157,7 @@ END $$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE sell_investment_shares_by_share(
+CREATE PROCEDURE sell_investment_by_share(
 IN transaction_date_p VARCHAR(50), IN account_id_p INT, IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
 BEGIN
 -- sells stock for CASH
@@ -194,7 +194,7 @@ END $$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE sell_investment_shares_by_dollar(
+CREATE PROCEDURE sell_investment_by_amount(
 IN transaction_date_p VARCHAR(50), IN account_id_p INT, IN dollars_p FLOAT, IN symbol_p VARCHAR(10))
 BEGIN
 	-- Executes a trade with the given dollar amount 
@@ -203,8 +203,8 @@ BEGIN
     -- number shares = dollars/daily value
     SELECT dollars_p/daily_value INTO number_shares_p FROM investments WHERE symbol = symbol_p;
     
-    -- execute the trade by calling sell_investment_shares_by_share
-    CALL sell_investment_shares_by_share(transaction_date_p, account_id_p, number_shares_p, symbol_p);
+    -- execute the trade by calling sell_investment_by_share
+    CALL sell_investment_by_share(transaction_date_p, account_id_p, number_shares_p, symbol_p);
 
 	-- Return success code
 	SELECT 200 AS result;    
@@ -212,7 +212,7 @@ END $$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE sell_investment_shares_by_share_account_nickname(
+CREATE PROCEDURE sell_investment_by_share_account_nickname(
 IN transaction_date_p VARCHAR(50), IN account_nickname_p VARCHAR(100), IN user_id_p INT, IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
 BEGIN
 	DECLARE account_id_result INT;
@@ -221,7 +221,7 @@ BEGIN
     SELECT account_id INTO account_id_result FROM accounts where account_nickname = account_nickname_p AND user_id = user_id_p;
     
     -- call the function
-    CALL sell_investment_shares_by_share(transaction_date_p, account_id_p, number_shares_p, symbol_p);
+    CALL sell_investment_by_share(transaction_date_p, account_id_p, number_shares_p, symbol_p);
 
 	-- Return success code
 	SELECT 200 AS result;    
@@ -229,7 +229,7 @@ END $$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE sell_investment_shares_by_dollar_account_nickname(
+CREATE PROCEDURE sell_investment_by_amount_account_nickname(
 IN transaction_date_p VARCHAR(50), IN account_nickname_p VARCHAR(100), IN user_id_p INT, IN dollars_p FLOAT, IN symbol_p VARCHAR(10))
 BEGIN
 	DECLARE account_id_result INT;
@@ -238,7 +238,7 @@ BEGIN
     SELECT account_id INTO account_id_result FROM accounts where account_nickname = account_nickname_p AND user_id = user_id_p;
     
     -- call the function
-    CALL sell_investment_shares_by_dollar(transaction_date_p, account_id_p, dollars_p, symbol_p);
+    CALL sell_investment_by_amount(transaction_date_p, account_id_p, dollars_p, symbol_p);
     
 	-- Return success code
 	SELECT 200 AS result;    
@@ -246,8 +246,8 @@ END $$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE buy_investment_shares_by_share_account_nickname(
-IN transaction_date_p VARCHAR(50), IN account_nickname VARCHAR(100), IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
+CREATE PROCEDURE buy_investment_by_share_account_nickname(
+IN transaction_date_p VARCHAR(50), IN account_nickname VARCHAR(100), IN user_id_p INT, IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
 BEGIN
 	DECLARE account_id_result INT;
     
@@ -255,7 +255,7 @@ BEGIN
     SELECT account_id INTO account_id_result FROM accounts where account_nickname = account_nickname_p AND user_id = user_id_p;
     
     -- call the function
-    CALL buy_investment_shares_by_share(transaction_date_p, account_id_p, number_shares_p, symbol_p);
+    CALL buy_investment_by_share(transaction_date_p, account_id_p, number_shares_p, symbol_p);
 
 	-- Return success code
 	SELECT 200 AS result;    
@@ -263,8 +263,8 @@ END $$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE buy_investment_shares_by_dollar_account_nickname(
-IN transaction_date_p VARCHAR(50), IN account_nickname VARCHAR(100), IN dollars_p FLOAT, IN symbol_p VARCHAR(10))
+CREATE PROCEDURE buy_investment_by_amount_account_nickname(
+IN transaction_date_p VARCHAR(50), IN account_nickname VARCHAR(100),  IN user_id_p INT, IN dollars_p FLOAT, IN symbol_p VARCHAR(10))
 BEGIN
 	-- wrapper for buy_investment_shares_by_dollar that let's input be account_nickname and user_id
 	DECLARE account_id_result INT;
@@ -273,7 +273,7 @@ BEGIN
     SELECT account_id INTO account_id_result FROM accounts where account_nickname = account_nickname_p AND user_id = user_id_p;
     
     -- call the function
-    CALL buy_investment_shares_by_dollar(transaction_date_p, account_id_p, dollars_p, symbol_p);
+    CALL buy_investment_by_amount(transaction_date_p, account_id_p, dollars_p, symbol_p);
     
 	-- Return success code
 	SELECT 200 AS result;
@@ -851,23 +851,21 @@ CREATE PROCEDURE view_accounts_details_for_family(IN family_id_p INT)
 BEGIN
 -- Given a family id, show account details table
     DECLARE family_does_not_exist BOOLEAN;
-
+ 
 	-- Error Handling ----------------------------------------------------------------------------------------- 
     -- Check if family exists
     SELECT COUNT(*) != 1 INTO family_does_not_exist FROM families WHERE family_id = family_id_p;
-    
     IF family_does_not_exist THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "Family ID does not exist, cannot retrieve account values.";
     END IF;
-    
 	-- Execute view -------------------------------------------------------------------------------------------   
 	SELECT 
 		accounts.account_nickname AS "Account Name",
 		accounts.account_type AS "Account Type",
 		CONCAT('$ ', FORMAT(SUM(number_shares * daily_value), 2), 0) AS "Account Value"
-	FROM holdings 
-	JOIN investments ON holdings.symbol = investments.symbol 
-	JOIN accounts ON holdings.account_id = accounts.account_id
+	FROM accounts 
+    LEFT JOIN holdings ON accounts.account_id = holdings.account_id
+    LEFT JOIN investments ON holdings.symbol = investments.symbol 
     JOIN users ON users.user_id = accounts.user_id
 	WHERE users.family_id = family_id_p
 	GROUP BY 
@@ -973,7 +971,6 @@ BEGIN
 END $$
 DELIMITER ;
 
-DROP PROCEDURE IF EXISTS view_goals_for_user;
 DELIMITER $$
 CREATE PROCEDURE view_goals_for_user(IN user_id_p INT)
 BEGIN
@@ -987,9 +984,9 @@ BEGIN
     END IF;
 	-- Execute view -------------------------------------------------------------------------------------------   
 	SELECT 
-		GROUP_CONCAT(DISTINCT accounts.account_nickname SEPARATOR ", ") AS "Account Name",
+		COALESCE(GROUP_CONCAT(DISTINCT accounts.account_nickname SEPARATOR ", "), " - ") AS "Account Name(s)",
 		goals.goal_name AS "Goal Name",
-        CONCAT('$ ', FORMAT(SUM(number_shares * daily_value), 2)) AS "Current Value",
+        CONCAT('$ ', FORMAT(COALESCE(SUM(number_shares * daily_value), 0), 2)) AS "Current Value",
         CONCAT('$ ', FORMAT(goals.goal_amount, 2)) AS "Goal Amount",
         CASE WHEN
         (ROUND(SUM(number_shares * daily_value), 2) > goals.goal_amount) = 1
@@ -1066,6 +1063,33 @@ BEGIN
 	RETURN result;
 	
 END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE view_my_holdings(IN user_id_p INT)
+BEGIN
+	-- given a user id, this shows the stock holdings of all accounts
+    DECLARE user_does_not_exist INT;
+    
+	-- Check if user exists
+	SELECT COUNT(*) != 1 INTO user_does_not_exist FROM users WHERE user_id = user_id_p;
+    IF user_does_not_exist THEN
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "User ID does not exist.";
+    END IF;
+    
+	SELECT 
+		account_nickname, 
+        account_type,
+        symbol,
+        number_shares, 
+        CONCAT("$ ", format(daily_value, 2)) AS daily_value,
+		CONCAT("$ ", format(number_shares*daily_value, 2)) AS total_value
+    FROM holdings 
+    NATURAL JOIN accounts 
+    NATURAL JOIN investments 
+    WHERE accounts.user_id = user_id_p AND number_shares > 0
+	ORDER BY account_nickname, symbol;
+END$$
 DELIMITER ;
 
 DELIMITER $$
