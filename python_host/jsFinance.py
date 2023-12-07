@@ -3,11 +3,9 @@ Filename: jsFinance.py
 Purpose : this file contains the jsFinance class. This class represents an instance of a command line interface. To
           interact with jsFinance class run the file "run_jsfinance.py" or see README.md for more guidance.
 """
-"""
 
+"""
 Pre-presentation priorities__________________________________________________________________________________________
-todo: presentation (slides??) - Sarah post on piazza to see. Present @2:50 
-todo: test connection to database via user input.
 todo: delete operations
 todo: transaction operations
 todo: ensure 3-4 desired demonstration aspects are VERY POLISHED. Maybe yfinance download, view goals, and sell stock/
@@ -71,7 +69,7 @@ class jsFinance:
         :param authentication_dict: optional parameter, dictionary of the form:
                 {"host": "some_hostname", "username": "some_username", "password": "some_password"
         """
-        self.welcome_message()
+        welcome_message()
 
         # Connect via default connection (command line input) or via authentication dictionary
         if authentication_dict:
@@ -118,23 +116,11 @@ class jsFinance:
             "Admin": True,
             "category": "General"
         }
-        self.command_dict["exit"] = {
-            "command": self.exit_program,
-            "user": True,
-            "Admin": True,
-            "category": "General"
-        }
         self.command_dict["clear"] = {
-            "command": self.clear_screen,
+            "command": clear_screen,
             "user": True,
             "Admin": True,
             "category": "General"
-        }
-        self.command_dict["view my accounts"] = {
-            "command": self.view_account_details_for_user,
-            "user": True,
-            "Admin": False,
-            "category": "View"
         }
         self.command_dict["select user"] = {
             "command": self.select_user,
@@ -146,6 +132,12 @@ class jsFinance:
             "command": self.enter_admin_mode,
             "user": True,
             "Admin": False,
+            "category": "General"
+        }
+        self.command_dict["exit"] = {
+            "command": self.exit_program,
+            "user": True,
+            "Admin": True,
             "category": "General"
         }
         self.command_dict["create user"] = {
@@ -178,6 +170,12 @@ class jsFinance:
             "Admin": False,
             "category": "Modify"
         }
+        self.command_dict["place trade"] = {
+            "command": self.place_trade,
+            "user": True,
+            "Admin": False,
+            "category": "Transact"
+        }
         self.command_dict["deposit money"] = {
             "command": self.deposit_money,
             "user": True,
@@ -190,11 +188,11 @@ class jsFinance:
             "Admin": False,
             "category": "Transact"
         }
-        self.command_dict["place trade"] = {
-            "command": self.place_trade,
+        self.command_dict["view my accounts"] = {
+            "command": self.view_account_details_for_user,
             "user": True,
             "Admin": False,
-            "category": "Transact"
+            "category": "View"
         }
         self.command_dict["view all families"] = {
             "command": self.view_all_families,
@@ -213,30 +211,6 @@ class jsFinance:
             "user": False,
             "Admin": True,
             "category": "View"
-        }
-        self.command_dict["delete my goal"] = {
-            "command": self.delete_goal,
-            "user": True,
-            "Admin": False,
-            "category": "Modify"
-        }
-        self.command_dict["delete my entire account"] = {
-            "command": self.delete_user,
-            "user": True,
-            "Admin": False,
-            "category": "Modify"
-        }
-        self.command_dict["delete my family"] = {
-            "command": self.delete_family,
-            "user": True,
-            "Admin": False,
-            "category": "Modify"
-        }
-        self.command_dict["remove myself from family"] = {
-            "command": self.update_my_family_to_null,
-            "user": True,
-            "Admin": False,
-            "category": "Modify"
         }
         self.command_dict["view all goals"] = {
             "command": self.view_all_goals,
@@ -298,6 +272,42 @@ class jsFinance:
             "Admin": False,
             "category": "View"
         }
+        self.command_dict["update goal amount"] = {
+            "command": self.update_goal_amount,
+            "user": True,
+            "Admin": False,
+            "category": "Modify"
+        }
+        self.command_dict["update account's goal"] = {
+            "command": self.update_accounts_goal,
+            "user": True,
+            "Admin": False,
+            "category": "Modify"
+        }
+        self.command_dict["delete my goal"] = {
+            "command": self.delete_goal,
+            "user": True,
+            "Admin": False,
+            "category": "Modify"
+        }
+        self.command_dict["delete my entire account"] = {
+            "command": self.delete_user,
+            "user": True,
+            "Admin": False,
+            "category": "Modify"
+        }
+        self.command_dict["delete my family"] = {
+            "command": self.delete_family,
+            "user": True,
+            "Admin": False,
+            "category": "Modify"
+        }
+        self.command_dict["remove myself from family"] = {
+            "command": self.update_my_family_to_null,
+            "user": True,
+            "Admin": False,
+            "category": "Modify"
+        }
 
         # Build out menu options based on command_dict
         command_list = {"user": {"General": [], "View": [], "Modify": [], "Transact": []},
@@ -323,19 +333,19 @@ class jsFinance:
                 # Put into temporary df object
                 temporary_command_df = pd.DataFrame({f"{category}": commands})
 
+                # Build out DataFrames and fill all nans with empty strings
                 if user_type == "Admin":
                     admin_df = pd.concat([admin_df, temporary_command_df], axis=1).fillna('')
                 elif user_type == "user":
                     user_df = pd.concat([user_df, temporary_command_df], axis=1).fillna('')
 
-        # Finally, store in
+        # Finally, store in self.command table so help() method can access this.
         self.command_table["Admin"] = admin_df
         self.command_table["user"] = user_df
 
     def run(self):
         """
         This method runs the command line interface until an error occurs, or until the user quits.
-        :return: void
         """
         exit_program = False
 
@@ -419,7 +429,6 @@ class jsFinance:
         """
         Parses user_input and then executes the associated command from self.command_dict.
         :param user_input: string with desired command, like "help" or "show goals"
-        :return: VOID
         """
         # Start by stripping all whitespace from user_input and making lower case
         parsed_input = user_input.strip().lower()
@@ -1172,3 +1181,39 @@ class jsFinance:
         # Execute the sql code
         cursor_output = self.sql_helper(prompt, input_requirements)
         result = self.parse_result("print table", cursor_output)
+
+    def update_goal_amount(self):
+        """
+        Allows a user to update their goal to a new amount.
+        """
+        prompt = f"CALL update_goal_amount"
+        input_requirements = [
+            {"user_input": "Provide name of goal to update:", "data": None, "data_type": "string"},
+            {"user_input": None, "data": self.user, "data_type": "number"},
+            {"user_input": "Provide new goal amount: $", "data": None, "data_type": "number"}
+        ]
+
+        # Execute the sql code
+        cursor_output = self.sql_helper(prompt, input_requirements)
+        result = self.parse_result("single number", cursor_output)
+
+        if result == 200:
+            print("Successfully updated goal amount.")
+
+    def update_accounts_goal(self):
+        """
+        Allows a user to update an account to associate it with a given goal.
+        """
+        prompt = f"CALL update_goal_amount"
+        input_requirements = [
+            {"user_input": None, "data": self.user, "data_type": "number"},
+            {"user_input": "Provide account nickname:", "data": None, "data_type": "string"},
+            {"user_input": "Provide name of goal:", "data": None, "data_type": "string"}
+        ]
+
+        # Execute the sql code
+        cursor_output = self.sql_helper(prompt, input_requirements)
+        result = self.parse_result("single number", cursor_output)
+
+        if result == 200:
+            print("Successfully updated goal associated with account.")
