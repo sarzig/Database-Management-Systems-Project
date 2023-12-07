@@ -133,7 +133,7 @@ class jsFinance:
             "user": True,
             "Admin": True
         }
-        self.command_dict["view my account details"] = {
+        self.command_dict["view my accounts"] = {
             "command": self.view_account_details_for_user,
             "user": True,
             "Admin": False
@@ -503,7 +503,7 @@ class jsFinance:
         except pymysql.Error as e:
 
             # Extract the error text by finding portion in single quotes
-            print(f"SQL Error: {extract_error_message_from_signal(str(e))}")
+            print(f"Program Error: {extract_error_message_from_signal(str(e))}")
 
         # Catch all other exceptions (unknown case)
         except Exception as e:
@@ -800,16 +800,20 @@ class jsFinance:
         """
         prompt = f"CALL take_loan_by_account_name"
 
+        transaction_date = datetime.datetime.today().strftime("%Y-%m-%d")
+
         input_requirements = [
-            {"user_input": "Provide goal name:", "data": None, "data_type": "string"},
-            {"user_input": "Provide goal amount:", "data": None, "data_type": "number"},
-            {"user_input": None, "data": self.user, "data_type": "number"}
+            {"user_input": None, "data": transaction_date, "data_type": "string"},
+            {"user_input": "Provide account nickname:", "data": None, "data_type": "string"},
+            {"user_input": None, "data": self.user, "data_type": "number"},
+            {"user_input": "Provide loan amount: $", "data": None, "data_type": "number"}
         ]
 
         # Execute the sql code
         cursor_output = self.sql_helper(prompt, input_requirements)
         result = self.parse_result("single number", cursor_output)
 
+        print_troubleshoot(result)
         if result == 200:
             print("Successfully took out loan.")
 
@@ -817,6 +821,23 @@ class jsFinance:
         """
         Using the account nickname, the user can deposit money in the account.
         """
+        prompt = f"CALL deposit_money_by_account_name"
+
+        transaction_date = datetime.datetime.today().strftime("%Y-%m-%d")
+
+        input_requirements = [
+            {"user_input": None, "data": transaction_date, "data_type": "string"},
+            {"user_input": "Provide account nickname:", "data": None, "data_type": "string"},
+            {"user_input": None, "data": self.user, "data_type": "number"},
+            {"user_input": "Provide deposit amount: $", "data": None, "data_type": "number"}
+        ]
+
+        # Execute the sql code
+        cursor_output = self.sql_helper(prompt, input_requirements)
+        result = self.parse_result("single number", cursor_output)
+
+        if result == 200:
+            print("Successfully deposited money.")
 
     def delete_user(self):
         """
