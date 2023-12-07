@@ -23,9 +23,7 @@ BEGIN
     END IF;
     
     -- Finally, return the account_id
-    
     RETURN account_id_result;
-
 END $$
 DELIMITER ;
 
@@ -42,6 +40,26 @@ BEGIN
     -- make the transaction
     CALL create_transaction(transaction_date_p, amount_p, "CASH", account_id_p);
     
+	-- Return success code
+	SELECT 200 AS result;
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE deposit_money_by_account_name(
+IN transaction_date_p VARCHAR(50), IN account_nickname_p VARCHAR(100), IN user_id_p INT, IN amount_p FLOAT)
+BEGIN
+    -- deposits money into an account given a user_id and an account nickname
+    DECLARE account_id_p INT;
+	
+    -- Find the account_id_p (error handlin occurs in the function get_account_id_from_user_id_and_account_nickname)
+	SELECT get_account_id_from_user_id_and_account_nickname(user_id_p, account_nickname_p) INTO account_id_p;
+
+    -- make the transaction
+    CALL deposit_money(transaction_date_p, account_id_p, amount_p);
+    
+	-- Return success code
+	SELECT 200 AS result;
 END $$
 DELIMITER ;
 
@@ -58,23 +76,11 @@ BEGIN
     -- make the transaction (always pass absolute value of amount)
     CALL create_transaction(transaction_date_p, abs(amount_p), "DEBT", account_id_p);
     
+	-- Return success code
+	SELECT 200 AS result;
 END $$
 DELIMITER ;
 
-DELIMITER $$
-CREATE PROCEDURE deposit_money_by_account_name(
-IN transaction_date_p VARCHAR(50), IN account_nickname_p VARCHAR(100), IN user_id_p INT, IN amount_p FLOAT)
-BEGIN
-    -- deposits money into an account given a user_id and an account nickname
-    DECLARE account_id_p INT;
-	
-    -- Find the account_id_p (error handlin occurs in the function get_account_id_from_user_id_and_account_nickname)
-	SELECT get_account_id_from_user_id_and_account_nickname(user_id_p, account_nickname_p) INTO account_id_p;
-
-    -- make the transaction
-    CALL deposit_money(transaction_date_p, account_id_p, amount_p);
-END $$
-DELIMITER ;
 
 DELIMITER $$
 CREATE PROCEDURE take_loan_by_account_name(
@@ -88,6 +94,10 @@ BEGIN
 
     -- make the transaction
     CALL take_loan(transaction_date_p, account_id_p, amount_p);
+    
+	-- Return success code
+	SELECT 200 AS result;
+    
 END $$
 DELIMITER ;
 
@@ -123,6 +133,8 @@ BEGIN
 	CALL create_transaction(transaction_date_p, -1*investment_total_cost, "CASH", account_id_p);
 	CALL create_transaction(transaction_date_p, number_shares_p, symbol_p, account_id_p);
 
+	-- Return success code
+	SELECT 200 AS result;
 END $$
 DELIMITER ;
 
@@ -138,10 +150,11 @@ BEGIN
     
     -- execute the trade by calling buy_investment_shares_by_share
     CALL buy_investment_shares_by_share(transaction_date_p, account_id_p, number_shares_p, symbol_p);
-    
+	
+    -- Return success code
+	SELECT 200 AS result;
 END $$
 DELIMITER ;
-
 
 DELIMITER $$
 CREATE PROCEDURE sell_investment_shares_by_share(
@@ -174,6 +187,9 @@ BEGIN
 	-- Execute trade - first delete stock and then deposit the cash
 	CALL create_transaction(transaction_date_p, -1*number_shares_p, symbol_p, account_id_p);
 	CALL create_transaction(transaction_date_p, investment_total_cost, "CASH", account_id_p);
+    
+    -- Return success code
+	SELECT 200 AS result;
 END $$
 DELIMITER ;
 
@@ -189,7 +205,9 @@ BEGIN
     
     -- execute the trade by calling sell_investment_shares_by_share
     CALL sell_investment_shares_by_share(transaction_date_p, account_id_p, number_shares_p, symbol_p);
-    
+
+	-- Return success code
+	SELECT 200 AS result;    
 END $$
 DELIMITER ;
 
@@ -204,7 +222,9 @@ BEGIN
     
     -- call the function
     CALL sell_investment_shares_by_share(transaction_date_p, account_id_p, number_shares_p, symbol_p);
-    
+
+	-- Return success code
+	SELECT 200 AS result;    
 END $$
 DELIMITER ;
 
@@ -220,6 +240,8 @@ BEGIN
     -- call the function
     CALL sell_investment_shares_by_dollar(transaction_date_p, account_id_p, dollars_p, symbol_p);
     
+	-- Return success code
+	SELECT 200 AS result;    
 END $$
 DELIMITER ;
 
@@ -234,7 +256,9 @@ BEGIN
     
     -- call the function
     CALL buy_investment_shares_by_share(transaction_date_p, account_id_p, number_shares_p, symbol_p);
-    
+
+	-- Return success code
+	SELECT 200 AS result;    
 END $$
 DELIMITER ;
 
@@ -251,6 +275,8 @@ BEGIN
     -- call the function
     CALL buy_investment_shares_by_dollar(transaction_date_p, account_id_p, dollars_p, symbol_p);
     
+	-- Return success code
+	SELECT 200 AS result;
 END $$
 DELIMITER ;
 

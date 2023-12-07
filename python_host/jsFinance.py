@@ -173,6 +173,16 @@ class jsFinance:
             "user": True,
             "Admin": False
         }
+        self.command_dict["deposit money"] = {
+            "command": self.deposit_money,
+            "user": True,
+            "Admin": False
+        }
+        self.command_dict["take out loan"] = {
+            "command": self.take_out_loan,
+            "user": True,
+            "Admin": False
+        }
         self.command_dict["view all families"] = {
             "command": self.view_all_families,
             "user": False,
@@ -783,6 +793,30 @@ class jsFinance:
             print("Successfully added user to family.")
             self.automatic_family_update()
             print_troubleshoot(f"update_my_family(): new family is now {self.family}")
+
+    def take_out_loan(self):
+        """
+        Using the account nickname, the user can take out a loan in the account.
+        """
+        prompt = f"CALL take_loan_by_account_name"
+
+        input_requirements = [
+            {"user_input": "Provide goal name:", "data": None, "data_type": "string"},
+            {"user_input": "Provide goal amount:", "data": None, "data_type": "number"},
+            {"user_input": None, "data": self.user, "data_type": "number"}
+        ]
+
+        # Execute the sql code
+        cursor_output = self.sql_helper(prompt, input_requirements)
+        result = self.parse_result("single number", cursor_output)
+
+        if result == 200:
+            print("Successfully took out loan.")
+
+    def deposit_money(self):
+        """
+        Using the account nickname, the user can deposit money in the account.
+        """
 
     def delete_user(self):
         """
