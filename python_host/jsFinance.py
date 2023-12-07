@@ -163,6 +163,16 @@ class jsFinance:
             "user": True,
             "Admin": True
         }
+        self.command_dict["create goal"] = {
+            "command": self.create_goal,
+            "user": True,
+            "Admin": False
+        }
+        self.command_dict["update my family"] = {
+            "command": self.update_my_family,
+            "user": True,
+            "Admin": False
+        }
         self.command_dict["view all families"] = {
             "command": self.view_all_families,
             "user": False,
@@ -185,6 +195,11 @@ class jsFinance:
         }
         self.command_dict["delete my entire account"] = {
             "command": self.delete_user,
+            "user": True,
+            "Admin": False
+        }
+        self.command_dict["remove myself from family"] = {
+            "command": self.update_my_family_to_null,
             "user": True,
             "Admin": False
         }
@@ -510,7 +525,6 @@ class jsFinance:
                     print("Error in parse result: expected numeric.")
                     return None
             else:
-                print("There is nothing to show for that request.")
                 return None
 
         elif result_expectation == "string":
@@ -558,7 +572,7 @@ class jsFinance:
             self.automatic_family_update()
             self.automatic_first_name_update()
         else:
-            print('That was not a valid user email. Try "view all users" to see valid emails.')
+            print('Try "view all users" to see valid user emails.')
 
     def automatic_family_update(self):
         """
@@ -668,6 +682,31 @@ class jsFinance:
         # Execute the sql code
         cursor_output = self.sql_helper(prompt, input_requirements)
 
+        result = self.parse_result(cursor_output)
+
+        if result == 200:
+            print("Successfully created account.")
+
+    def create_goal(self):
+        """
+        Creates a goal associated with the current user.
+        """
+
+        prompt = f"CALL create_goal"
+
+        input_requirements = [
+            {"user_input": "Provide goal name:", "data": None, "data_type": "string"},
+            {"user_input": "Provide goal amount:", "data": None, "data_type": "number"},
+            {"user_input": None, "data": self.user, "data_type": "number"}
+        ]
+
+        # Execute the sql code
+        cursor_output = self.sql_helper(prompt, input_requirements)
+        result = self.parse_result("single number", cursor_output)
+
+        if result == 200:
+            print("Successfully created goal.")
+
     def create_family(self):
         """
         Creates a new family. If in admin mode, this simply creates a family. If in user mode,
@@ -701,6 +740,44 @@ class jsFinance:
         if self.user != "Admin":
             self.family = family_id
             self.update_user_family(family_id)
+
+    def update_my_family_to_null(self):
+        """
+        Removes a user's association with their family.
+        """
+        prompt = f"CALL update_user_family_to_null"
+        input_requirements = [
+            {"user_input": None, "data": self.user, "data_type": "number"}
+        ]
+
+        # Execute the sql code
+        cursor_output = self.sql_helper(prompt, input_requirements)
+        result = self.parse_result("single number", cursor_output)
+
+        # If deletion was a success, print a message and update the session details
+        if result == 200:
+            print("Successfully removed user from family.")
+            self.automatic_family_update()  # update session variable
+
+    def update_my_family(self):
+        """
+        Removes a user's association with their family.
+        """
+        prompt = f"CALL update_user_family"
+        input_requirements = [
+            {"user_input": None, "data": self.user, "data_type": "number"},
+            {"user_input": "Provide Family ID of family you wish to join:", "data": self.user, "data_type": "number"}
+        ]
+
+        # Execute the sql code
+        cursor_output = self.sql_helper(prompt, input_requirements)
+        result = self.parse_result("single number", cursor_output)
+
+        # If deletion was a success, print a message and update the session details
+        if result == 200:
+            print("Successfully added user to family.")
+            self.automatic_family_update()
+            print_troubleshoot(f"update_my_family(): new family is now {self.family}")
 
     def delete_user(self):
         """

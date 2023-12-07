@@ -792,19 +792,18 @@ BEGIN
 END $$
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS view_goals_for_user;
 DELIMITER $$
 CREATE PROCEDURE view_goals_for_user(IN user_id_p INT)
 BEGIN
     DECLARE user_does_not_exist BOOLEAN;
-
+ 
 	-- Error Handling -------------------------------------------------------------------------------------------   
     -- Check if user exists
     SELECT COUNT(*) != 1 INTO user_does_not_exist FROM users WHERE user_id = user_id_p;
-    
     IF user_does_not_exist THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "User ID does not exist, cannot retrieve account values.";
     END IF;
-    
 	-- Execute view -------------------------------------------------------------------------------------------   
 	SELECT 
 		GROUP_CONCAT(DISTINCT accounts.account_nickname SEPARATOR ", ") AS "Account Name",
@@ -817,12 +816,11 @@ BEGIN
         ELSE "NO"
         END
         AS "Is obtained?"
-
-	FROM holdings 
-	JOIN investments ON holdings.symbol = investments.symbol 
-	RIGHT JOIN accounts ON holdings.account_id = accounts.account_id
-    JOIN goals ON accounts.user_id = goals.user_id AND accounts.goal_id = goals.goal_id
-	WHERE accounts.user_id = user_id_p
+	FROM goals 
+    LEFT JOIN accounts ON goals.user_id = accounts.user_id AND goals.goal_id = accounts.goal_id
+    LEFT JOIN holdings ON accounts.account_id = holdings.account_id
+	LEFT JOIN investments ON holdings.symbol = investments.symbol 
+    WHERE goals.user_id = user_id_p
 	GROUP BY 
 		goals.goal_name,
         goals.goal_amount;
