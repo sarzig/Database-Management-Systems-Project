@@ -267,7 +267,3 @@ INSERT INTO holdings (account_id, symbol, number_shares) VALUES
 (14, 'SLB', 380.40),
 (14, 'SO', 140.80),
 (14, 'PG', 135.90);
-
-INSERT INTO transactions(transaction_date, number_shares, symbol, account_id, value_transacted_at) VALUES
-("2022-10-05", 2, "SBUX", 1, 200),
-("2022-10-06", 3, "AMZN", 1, 4);

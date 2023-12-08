@@ -30,7 +30,7 @@ def connect_via_command_line_input():
     host = input("Enter database host (often 'localhost'): ").strip()
     username = input("Enter database username (often 'root'): ").strip()
     password = input("Enter database password: ").strip()
-    authentication_dict = {"host": host, "username": username, "password": password}
+    authentication_dict = {"host": host, "username": username, "password": "merapass"}
 
     # Attempt connection via connect_to_sql_database and then check validity of the result
     database = connect_to_sql_database(authentication_dict)

@@ -57,14 +57,14 @@ class jsFinance:
         - user:          Contains either the user_id of the current user or the phrase "Admin".
         - first_name:    Contains either the first_name of the current user or the phrase "Admin".
         - family:        If a user is selected, this holds the family_id of that user. Otherwise, is None.
-        - command_dict:  Holds function objects which have keys representing user comamnds.
+        - command_dict:  Holds function objects which have keys representing user commands.
         - command_table: Holds tables which are called via help() method.
     """
 
     def __init__(self, authentication_dict=None):
         """
         Constructor initializes a jsFinance instance. If database connection is unsuccessful, the program
-        will end during this consturctor (via the connect_via_command_line_input() function).
+        will end during this constructor (via the connect_via_command_line_input() function).
 
         :param authentication_dict: optional parameter, dictionary of the form:
                 {"host": "some_hostname", "username": "some_username", "password": "some_password"
@@ -85,7 +85,7 @@ class jsFinance:
         self.cursor = self.connection.cursor()
 
         # Define user role details
-        self.user = "Admin"  # tracks current user role
+        self.user = "Admin"  # tracks current user role ("Admin") OR user_id (i.e. 2, 4, 5)
         self.first_name = "Admin"  # tracks current username
         self.family = None  # IF self.user is not Admin (is a specific user), this holds the family information
 
@@ -93,22 +93,21 @@ class jsFinance:
         self.command_dict = {}
         self.command_table = {}
         self.define_command_dict()
+        self.define_command_table()
 
     def define_command_dict(self):
         """
         Builds out the self.command_dict and self.command_table. self.command_dict is the main logical feature
         that transforms users' commands into actions.
 
-        self.command_table is the helpful table that can be shown to the user with the "help" command.
+        self.command_dict is a dictionary of dictionaries.
+           - key:     the command the user can type to execute the action
+        Inner dictionary contains:
+            - command:   the function object which executes the given command (no parameters allowed).
+            - user:      boolean. If True, this command is allowed for role:user.
+            - Admin:     boolean. If True, this command is allowed for role:Admin.
+            - category:  string. Stores the menu heading of that command
         """
-
-        # self.command_dict is a dictionary of dictionaries.
-        #    - key:     the command the user can type to execute the action
-        # Inner dictionary contains:
-        #    - command:   the function object which executes the given command (no parameters allowed).
-        #    - user:      boolean. If True, this command is allowed for role:user.
-        #    - Admin:     boolean. If True, this command is allowed for role:Admin.
-        #    - category:  string. Stores the menu heading of that command
 
         self.command_dict["help"] = {
             "command": self.help_command,
@@ -309,6 +308,12 @@ class jsFinance:
             "category": "Modify"
         }
 
+    def define_command_table(self):
+        """
+        Builds out the self.command_table, the helpful table that can be shown to the user with the "help" command.
+
+        Uses self.command_dict to populate the menus.
+        """
         # Build out menu options based on command_dict
         command_list = {"user": {"General": [], "View": [], "Modify": [], "Transact": []},
                         "Admin": {"General": [], "View": [], "Modify": [], "Transact": []}}
