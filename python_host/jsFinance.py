@@ -6,19 +6,13 @@ Purpose : this file contains the jsFinance class. This class represents an insta
 
 """
 Pre-presentation priorities__________________________________________________________________________________________
-todo: delete operations
-todo: transaction operations
 todo: yfinance implementation in jsFinance class. I'm thinking that we MANUALLY have people update this. 
       My tables_create starts with stock values so in the worst case,we just would have outdated stock information. 
       
 
 Pre turn-in priorities__________________________________________________________________________________________
-
 todo: update report (can we front load / get this out of the way on wednesday?)
 todo: test building code on sarah's work machine
-todo: implement user roles slightly more rigorously for extra credit....would involve "help" display including a message
-      about how "you're currently logged into a user role, and have these options." "You're admin, so you have THESE 
-      options."
 todo: https://piazza.com/class/lm0p7gnfxm55oo/post/823
 TA Yug Deepak Rajani: 
 * You can have a section "Prerequisites" as a part of which you can call out that Python and 

@@ -579,7 +579,7 @@ BEGIN
 	-- Check if family doesn't exist for non-null family_id_p
 	SELECT COUNT(*) = 0 INTO family_does_not_exist FROM families WHERE family_id = family_id_p;
     IF family_does_not_exist and family_id_p IS NOT NULL THEN
-    		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "Family ID does not exist, cannot update family.";
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "Family ID does not exist, cannot update family.";
     END IF;
     
     -- Check if family was already equal to NULL when trying to make family null
@@ -756,7 +756,7 @@ DELIMITER $$
 CREATE PROCEDURE sell_investment_by_share(
 IN transaction_date_p VARCHAR(50), IN account_id_p INT, IN number_shares_p FLOAT, IN symbol_p VARCHAR(10))
 BEGIN
--- sells stock for CASH
+	-- sells stock for CASH
 	DECLARE investment_daily_value FLOAT;
 	DECLARE investment_total_cost FLOAT;
     DECLARE shares_in_account FLOAT;
@@ -862,7 +862,7 @@ DELIMITER $$
 CREATE PROCEDURE buy_investment_by_amount_account_nickname(
 IN transaction_date_p VARCHAR(50), IN account_nickname_p VARCHAR(100), IN user_id_p INT, IN dollars_p FLOAT, IN symbol_p VARCHAR(10))
 BEGIN
-	-- wrapper for buy_investment_shares_by_dollar that lets input be account_nickname and user_id
+	-- wrapper for buy_investment_shares_by_amount that lets input be account_nickname and user_id
 	DECLARE account_id_p INT;
 
 	-- Find the account id    
