@@ -29,10 +29,16 @@ import sys
 from helpers import *
 import os
 
-# todo: delete troubleshooting var at end
+# todo: delete troubleshooting and look at all todos
 global troubleshoot
 troubleshoot = False
-
+def print_troubleshoot(item_to_print: str):
+    """
+    Helper method to delete later. todo: delete.
+    :param item_to_print: item to print if troubleshooting is activated
+    """
+    if troubleshoot:
+        print("Troubleshoot purposes only:" + str(item_to_print))
 
 class jsFinance:
     """

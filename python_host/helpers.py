@@ -1,5 +1,6 @@
 """
 Filename: helpers.py
+
 Purpose : This file contains helpers that support the "run_jsfinance.py" command line interface program, and helpers
           that support the jsFinance.py class.
 """
@@ -11,10 +12,6 @@ import pandas as pd
 import pymysql
 from tabulate import tabulate
 import os
-
-# todo delete global troubleshooting
-global troubleshoot
-troubleshoot = False
 
 
 def connect_via_command_line_input():
@@ -57,6 +54,28 @@ def connect_via_command_line_input():
             return None
 
 
+def welcome_message():
+    """
+    Prints message to inform user they've entered the program.
+    """
+
+    print("+----------------------------------------------------------------------------------------------------+")
+    print("|                                 jsFinance Personal Finance Tracker                                 |")
+    print("+----------------------------------------------------------------------------------------------------+")
+
+
+def clear_screen():
+    """
+    Clears screen of cli based on operating system and re-prints welcome message.
+    """
+    if os.name == 'nt':
+        os.system('cls')
+        welcome_message()
+    else:
+        os.system('clear')
+        welcome_message()
+
+
 def pretty_print_sql_results_table(sql_result_table):
     """
     Given a sql result table, this function formats the table in a more aesthetically pleasing way.
@@ -66,9 +85,12 @@ def pretty_print_sql_results_table(sql_result_table):
     # convert to DataFrame
     df = pd.DataFrame(sql_result_table)
 
-    # Rename columns
-    df.columns = [col.replace("_", " ").title().replace(" Id", " ID").replace("Id ", "ID ").
-                      replace(" At ", " at ").replace(" Of ", " of").replace("(S)", '(s)') for col in df.columns]
+    # Rename columns with title case - capitalize ID, un-capitalize "At", "Of", "(S)"
+    df.columns = [
+        col.replace("_", " ").title().replace(" Id", " ID").replace("Id ", "ID ")
+            .replace(" At ", " at ").replace(" Of ", " of").replace("(S)", '(s)') for col in df.columns]
+
+    # Print using tabulate library
     print(tabulate(df, headers='keys', tablefmt='pretty', showindex=False))
 
 
@@ -251,35 +273,3 @@ def get_yfinance(input_date: datetime.date) -> pd.DataFrame:
 
     # Return the dataFrame
     return sp_100
-
-
-def welcome_message():
-    """
-    Prints message to inform user they've entered the program.
-    """
-
-    print("+----------------------------------------------------------------------------------------------------+")
-    print("|                                 jsFinance Personal Finance Tracker                                 |")
-    print("+----------------------------------------------------------------------------------------------------+")
-
-
-def clear_screen():
-    """
-    Clears screen of cli based on operating system and re-prints welcome message.
-    """
-    print_troubleshoot(os.name)
-    if os.name == 'nt':
-        os.system('cls')
-        welcome_message()
-    else:
-        os.system('clear')
-        welcome_message()
-
-
-def print_troubleshoot(item_to_print: str):
-    """
-    Helper method to delete later. todo: delete.
-    :param item_to_print: item to print if troubleshooting is activated
-    """
-    if troubleshoot:
-        print("Troubleshoot purposes only:" + str(item_to_print))
