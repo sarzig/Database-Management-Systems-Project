@@ -215,6 +215,16 @@ BEGIN
     DECLARE daily_value_var DECIMAL(13, 2);
 
 	-- Error Handling
+    -- if cash doesn't exist in database then insert it
+    IF (SELECT COUNT(*) FROM investments WHERE symbol = "CASH") = 0 THEN
+		INSERT INTO investments (symbol, company_name, daily_value) VALUES ("CASH", "Cash", 1);
+	END IF;
+    
+    -- if debt doesn't exist in database then insert it
+	IF (SELECT COUNT(*) FROM investments WHERE symbol = "DEBT") = 0 THEN
+		INSERT INTO investments (symbol, company_name, daily_value) VALUES ("DEBT", "Debt", -1);
+	END IF;
+    
     -- if date isn't in correct format
     IF STR_TO_DATE(transaction_date_p, '%Y-%m-%d') IS NULL THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Incorrect date format: please use YYYY-MM-DD.';

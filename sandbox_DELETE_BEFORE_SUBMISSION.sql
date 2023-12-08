@@ -27,3 +27,6 @@ CALL deposit_money_by_account_name("2023-12-02", "my brokerage", 1, 1);
 CALL deposit_money("2023-12-02", 1, 1);
 CALL take_loan("2023-12-02", 1, 1);
 
+
+CALL create_transaction("2023-12-02", 1, "F", 1);
+

@@ -799,7 +799,8 @@ class jsFinance:
         cursor_output = self.sql_helper(prompt, input_requirements)
         family_id = self.parse_result("single number", cursor_output)
 
-        print_troubleshoot(f"matthews new fam id is {family_id}")
+        if family_id:
+            print("Successfully created family.")
 
         # If self.user != "Admin", then associate family id with current user and update self.family
         if self.user != "Admin":
