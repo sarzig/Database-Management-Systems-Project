@@ -1,5 +1,5 @@
 /*
-Filename: create_update_delete_procedures.sql
+Filename: js_finance_create_update_delete_procedures.sql
 Purpose:  This file contains all the create, update, and delete procedures that our database supports. 
 		  Procedures are split into: simple creates, simple updates, simple deletes, and complex 
           multi-operations (largely concerned with transacting money).
@@ -38,6 +38,8 @@ Contains: create_account(IN id_at_institution_p VARCHAR(50), IN institution_name
 |                                    Section 1: "Create" procedures                                  |
 +----------------------------------------------------------------------------------------------------+
 */
+
+USE jsfinance;
 
 DELIMITER $$
 CREATE PROCEDURE create_account(

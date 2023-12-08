@@ -1,5 +1,5 @@
 /*
-Filename: read_procedures.sql
+Filename: js_finance_read_procedures.sql
 
 Purpose:  This file contains all the read procedures for our database. It is separated into
           two sections: basic reads and complex reads.
