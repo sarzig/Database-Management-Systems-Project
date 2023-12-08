@@ -8,8 +8,6 @@ Purpose : this file contains the jsFinance class. This class represents an insta
 Pre-presentation priorities__________________________________________________________________________________________
 todo: delete operations
 todo: transaction operations
-todo: ensure 3-4 desired demonstration aspects are VERY POLISHED. Maybe yfinance download, view goals, and sell stock/
-      buy stock? 
 todo: yfinance implementation in jsFinance class. I'm thinking that we MANUALLY have people update this. 
       My tables_create starts with stock values so in the worst case,we just would have outdated stock information. 
       
@@ -17,7 +15,6 @@ todo: yfinance implementation in jsFinance class. I'm thinking that we MANUALLY 
 Pre turn-in priorities__________________________________________________________________________________________
 
 todo: update report (can we front load / get this out of the way on wednesday?)
-todo: figure out how to make this work for a no-password mysql
 todo: test building code on sarah's work machine
 todo: implement user roles slightly more rigorously for extra credit....would involve "help" display including a message
       about how "you're currently logged into a user role, and have these options." "You're admin, so you have THESE 

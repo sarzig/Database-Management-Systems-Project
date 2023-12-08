@@ -27,9 +27,9 @@ def connect_via_command_line_input():
     """
 
     # Prompt user for inputs and strip whitespace
-    host = input("Enter database host (often 'localhost'): ").strip()
-    username = input("Enter database username (often 'root'): ").strip()
-    password = input("Enter database password: ").strip()
+    host = input("Enter database host (such as 'localhost'): ").strip()
+    username = input("Enter database username (such as 'root'): ").strip()
+    password = input('Enter database password (for no password, just press "Enter"): ').strip()
     authentication_dict = {"host": host, "username": username, "password": password}
 
     # Attempt connection via connect_to_sql_database and then check validity of the result

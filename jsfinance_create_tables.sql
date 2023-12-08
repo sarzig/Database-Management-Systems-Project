@@ -1,3 +1,8 @@
+/*
+Filename: jsfinance_create_tables.sql
+Purpose:  Creates all tables needed for our database.
+*/
+
 DROP DATABASE IF EXISTS jsFinance;
 CREATE DATABASE jsFinance;
 USE jsFinance;
