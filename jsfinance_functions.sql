@@ -1,5 +1,6 @@
 /*
 Filename: js_finance_functions.sql
+
 Purpose:  This file contains all the functions used in our database. There is only one function which
           serves a create function, and all other functions are "gets" which involve sets of parameters 
           which can uniquely identify only one tuple in the database.

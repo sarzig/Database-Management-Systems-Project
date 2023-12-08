@@ -4,6 +4,10 @@ Filename: js_finance_read_procedures.sql
 Purpose:  This file contains all the read procedures for our database. It is separated into
           two sections: basic reads and complex reads.
 
+Errors:   Basic reads have no parameters and no error handling. Complex reads DO have
+		  paramaters, and if errors arise during the complex read procedures, signals are 
+          created with relevant error messaging.
+
 Contains: view_all_users()
           view_all_accounts()
           view_all_goals()

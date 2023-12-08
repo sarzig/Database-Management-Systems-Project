@@ -1,8 +1,13 @@
 /*
 Filename: js_finance_create_update_delete_procedures.sql
+
 Purpose:  This file contains all the create, update, and delete procedures that our database supports. 
 		  Procedures are split into: simple creates, simple updates, simple deletes, and complex 
           multi-operations (largely concerned with transacting money).
+          
+Errors:   All procedures in this file return success code 200 if the procedure completes with no errors.
+		  If errors arise during the running of the procedure, a signal will be raised and no success
+          code is generated.
           
 Contains: create_account(IN id_at_institution_p VARCHAR(50), IN institution_name_p VARCHAR(200), IN account_nickname_p VARCHAR(50), IN account_type_p VARCHAR(50), IN user_id_p INT, IN goal_name_p VARCHAR(50))
           create_goal(IN goal_name_p VARCHAR(1000), IN goal_amount_p INT, IN user_id_p INT)
@@ -193,6 +198,8 @@ BEGIN
 		VALUES (symbol_p, company_name_p, daily_value_p);
 	END IF;
     
+	-- Success code
+	SELECT 200 AS result;
 END $$
 DELIMITER ;
 
@@ -243,6 +250,9 @@ BEGIN
 		INSERT into holdings(number_shares, symbol, account_id) VALUES
         (number_shares_p, symbol_p, account_id_p);
     END IF;
+    
+	-- Success code
+	SELECT 200 AS result;
 END $$
 DELIMITER ;
 
@@ -268,6 +278,9 @@ BEGIN
     
     -- create the user
     INSERT INTO USERS(email, first_name, last_name, family_id) VALUES (email_p, first_name_p, last_name_p, family_id_p);
+    
+	-- Success code
+	SELECT 200 AS result;
 END $$
 DELIMITER ;
 
@@ -419,6 +432,8 @@ BEGIN
     
 	UPDATE accounts SET goal_id = new_goal_id WHERE user_id = user_id_p AND account_nickname = account_nickname_p;
     
+	-- Success code
+	SELECT 200 AS result;
 END $$
 DELIMITER ;
 
@@ -538,6 +553,8 @@ BEGIN
     -- update the stock's daily value
     UPDATE investments SET daily_value = new_daily_value_p WHERE symbol = symbol_p;
 
+	-- Success code
+	SELECT 200 AS result;
 END $$
 DELIMITER ;
 
@@ -588,10 +605,13 @@ DELIMITER ;
 DELIMITER $$
 CREATE PROCEDURE update_user_family_to_null(IN user_id_p INT)
 BEGIN
--- To remove a user from a family, the user_id is needed. This procedure
--- requires an existing user_id and for that user to already be associated
--- with a family.
+	-- To remove a user from a family, the user_id is needed. This procedure
+	-- requires an existing user_id and for that user to already be associated
+	-- with a family.
     CALL update_user_family(user_id_p, NULL);
+    
+	-- Success code
+	SELECT 200 AS result;
 END $$
 DELIMITER ;
 
@@ -674,7 +694,6 @@ BEGIN
     
 	-- Return success code
 	SELECT 200 AS result;
-    
 END $$
 DELIMITER ;
 
