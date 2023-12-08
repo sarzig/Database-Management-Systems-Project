@@ -304,6 +304,12 @@ class jsFinance:
             "Admin": False,
             "category": "Modify"
         }
+        self.command_dict["update all stocks"] = {
+            "command": self.update_my_family_to_null,
+            "user": False,
+            "Admin": True,
+            "category": "Transact"
+        }
 
     def define_command_table(self):
         """

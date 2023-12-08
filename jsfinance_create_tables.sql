@@ -30,8 +30,8 @@ CREATE TABLE goals (
     goal_name VARCHAR(50) NOT NULL,
     goal_amount INT,
         
-    -- If user_id changes, restrict the change.
-    -- If user_id is deleted from database, then the user's goals are also deleted
+    -- If user_id changes, allow update.
+    -- If user_id is deleted from database, then the user's goals are also deleted.
     user_id INT,
     CONSTRAINT fk_user_id_goals FOREIGN KEY (user_id) REFERENCES users(user_id)
     ON UPDATE RESTRICT ON DELETE CASCADE,
@@ -49,10 +49,10 @@ CREATE TABLE accounts (
 	user_id INT,
     goal_id INT DEFAULT NULL,
     
-    -- If user_id changes, restrict the change.
-    -- If user_id is deleted from database, then the user's accounts are also deleted (yyy: is this bad?
+    -- If user_id changes, then update it.
+    -- If user_id is deleted from database, then the user's accounts are also deleted.
     CONSTRAINT fk_user_id_accounts FOREIGN KEY (user_id) REFERENCES users(user_id)
-    ON UPDATE RESTRICT ON DELETE CASCADE,
+    ON UPDATE CASCADE ON DELETE CASCADE,
     
     -- If goal_id changes, then cascade it.
     -- If goal is deleted, then set null - account is no longer linked to that goal.
@@ -77,15 +77,17 @@ CREATE TABLE transactions (
     transaction_date DATE,
     number_shares FLOAT,
     
-    -- blocks symbol from being deleted if it was used in any transactions
+    -- block symbol from being deleted if it was used in any transactions.
+    -- symbol CAN be updated.
     symbol VARCHAR(10),
 	CONSTRAINT fk_symbol_transactions FOREIGN KEY (symbol) REFERENCES investments(symbol) 
     ON UPDATE CASCADE ON DELETE RESTRICT,
     
-    -- if account_id is deleted, then delete associated transactions
+    -- if account_id is deleted, then keep transactions (but mark as NULL)
+    -- account_id CAN be updated.
     account_id INT,
 	CONSTRAINT fk_account_id_transactions FOREIGN KEY (account_id) REFERENCES accounts(account_id) 
-    ON UPDATE CASCADE ON DELETE CASCADE,
+    ON UPDATE CASCADE ON DELETE SET NULL,
 
     value_transacted_at DECIMAL(13, 2)
 );
