@@ -9,14 +9,18 @@ Errors:   All procedures in this file return success code 200 if the procedure c
 		  If errors arise during the running of the procedure, a signal will be raised and no success
           code is generated.
           
-Contains: create_account(IN id_at_institution_p VARCHAR(50), IN institution_name_p VARCHAR(200), IN account_nickname_p VARCHAR(50), IN account_type_p VARCHAR(50), IN user_id_p INT, IN goal_name_p VARCHAR(50))
+Contains: 
+     CREATE PROCEDURES:
+		  create_account(IN id_at_institution_p VARCHAR(50), IN institution_name_p VARCHAR(200), IN account_nickname_p VARCHAR(50), IN account_type_p VARCHAR(50), IN user_id_p INT, IN goal_name_p VARCHAR(50))
           create_goal(IN goal_name_p VARCHAR(1000), IN goal_amount_p INT, IN user_id_p INT)
           create_investment(IN symbol_p VARCHAR(10), IN company_name_p VARCHAR(200), IN daily_value_p DECIMAL(13,2))
           create_transaction(IN transaction_date_p VARCHAR(50), IN number_shares_p FLOAT, IN symbol_p VARCHAR(10), IN account_id_p INT)
           create_user(IN email_p VARCHAR(200), IN first_name_p VARCHAR(100), IN last_name_p VARCHAR(100), IN family_id_p INT)
+     DELETE PROCEDURES:          
           delete_account(IN account_nickname_p VARCHAR(1000), IN user_id_p INT)
           delete_family(IN family_id_p INT)
           delete_goal(IN goal_name_p VARCHAR(1000), IN user_id_p INT)
+     UPDATE PROCEDURES:          
           delete_user(IN user_id_p INT)
           update_accounts_goal(IN user_id_p INT, IN account_nickname_p VARCHAR(1000), IN goal_name_p VARCHAR(1000))
           update_goal_amount(IN goal_name_p VARCHAR(1000), IN user_id_p INT, IN new_goal_amount_p INT)
@@ -24,6 +28,7 @@ Contains: create_account(IN id_at_institution_p VARCHAR(50), IN institution_name
           update_stock_daily_value(IN symbol_p VARCHAR(10), IN new_daily_value_p DECIMAL(13,2))
           update_user_family(IN user_id_p INT, IN family_id_p INT)
           update_user_family_to_null(IN user_id_p INT)
+	COMPLEX PROCEDURES:
           deposit_money(IN transaction_date_p VARCHAR(50), IN account_id_p INT, IN amount_p FLOAT)
           deposit_money_by_account_name(IN transaction_date_p VARCHAR(50), IN account_nickname_p VARCHAR(100), IN user_id_p INT, IN amount_p FLOAT)
           take_loan(IN transaction_date_p VARCHAR(50), IN account_id_p INT, IN amount_p FLOAT)
