@@ -33,7 +33,7 @@ import os
 
 # todo: delete troubleshooting and look at all todos
 global troubleshoot
-troubleshoot = False
+troubleshoot = True
 
 def print_troubleshoot(item_to_print: str):
     """
