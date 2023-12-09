@@ -9,17 +9,6 @@ import time
 import sys
 from helpers import *
 
-# todo: delete troubleshooting and look at all todos
-global troubleshoot
-troubleshoot = True
-
-def print_troubleshoot(item_to_print: str):
-    """
-    Helper method to delete later. todo: delete.
-    :param item_to_print: item to print if troubleshooting is activated
-    """
-    if troubleshoot:
-        print("Troubleshoot purposes only:" + str(item_to_print))
 
 class jsFinance:
     """
@@ -501,8 +490,7 @@ class jsFinance:
                 print(f"An unknown error occurred.")
 
         concatenated_parameter_list = "(" + ", ".join(parameter_list) + ")"
-        # todo remove troubleshooting
-        print_troubleshoot(f"concatenated_parameter_list = {concatenated_parameter_list}")
+
         return concatenated_parameter_list
 
     def sql_helper(self, function_or_procedure_call, input_requirements=None):
@@ -533,7 +521,6 @@ class jsFinance:
 
         # Define the sql text
         sql_txt = f'{function_or_procedure_call}{parameter_list}'
-        print_troubleshoot(f"{sql_txt}")  # todo delete this troubleshooting
 
         # Try executing the function/procedure in the database
         try:
@@ -587,7 +574,6 @@ class jsFinance:
 
         elif result_expectation == "string":
             if sql_result_output:
-                print_troubleshoot(sql_result_output)
                 first_dict = sql_result_output[0]
                 key, value = next(iter(first_dict.items()))
                 if isinstance(value, str):
@@ -619,8 +605,6 @@ class jsFinance:
         cursor_output = self.sql_helper(prompt, input_requirements)
         user_id = self.parse_result("single number", cursor_output)
 
-        print_troubleshoot(f"user_id for that user was calculated to be: {user_id}")  # todo remove troubleshoot
-
         # If result of parse result is NOT none, then we have new user_id
         if user_id:
             # Updates self.user to the selected user
@@ -646,8 +630,6 @@ class jsFinance:
         cursor_output = self.sql_helper(prompt, input_requirements)
         family_id = self.parse_result("single number", cursor_output)
 
-        print_troubleshoot(f"family_id was found to be {family_id}")  # todo remove troubleshoot
-
         # Updates self.family to the selected family IF family_id is greater than 0
         if family_id > 0:
             self.family = family_id
@@ -669,14 +651,11 @@ class jsFinance:
         cursor_output = self.sql_helper(prompt, input_requirements)
         first_name = self.parse_result("string", cursor_output)
 
-        print_troubleshoot(f"first_name was found to be {first_name}")  # todo remove troubleshoot
-
         # Updates self.family to the selected family IF family_id is greater than 0
         if first_name != "":
             self.first_name = first_name
         # A user with no first_name will cause error
         else:
-            # todo: actual error handling or nah?
             print("Error: unknown state in automatic_first_name_update.")
 
     def update_user_family(self, new_family_id: str):
@@ -691,8 +670,6 @@ class jsFinance:
 
         # Execute the sql code
         cursor_output = self.sql_helper(prompt, input_requirements)
-        print_troubleshoot(cursor_output)
-        print_troubleshoot(self.parse_result("single number", cursor_output))
 
     def create_user(self):
         """
@@ -836,7 +813,6 @@ class jsFinance:
         if result == 200:
             print("Successfully added user to family.")
             self.automatic_family_update()
-            print_troubleshoot(f"update_my_family(): new family is now {self.family}")
 
     def update_all_stocks(self):
         """
@@ -900,7 +876,6 @@ class jsFinance:
         cursor_output = self.sql_helper(prompt, input_requirements)
         result = self.parse_result("single number", cursor_output)
 
-        print_troubleshoot(result)
         if result == 200:
             print("Successfully took out loan.")
 
@@ -1057,9 +1032,8 @@ class jsFinance:
 
     def view_all_accounts(self):
         """
-        Shows entire account table
+        Shows entire account table.
         """
-        # joseph todo : model off of view_all_families
 
         # Define prompt
         prompt = f"CALL view_all_accounts()"
@@ -1070,7 +1044,7 @@ class jsFinance:
 
     def view_all_goals(self):
         """
-        Shows entire goals table
+        Shows entire goals table.
         """
 
         # Define prompt
@@ -1082,7 +1056,7 @@ class jsFinance:
 
     def view_all_holdings(self):
         """
-        Shows entire holdings table
+        Shows entire holdings table.
         """
 
         # Define prompt
