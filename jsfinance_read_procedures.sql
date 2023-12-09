@@ -185,7 +185,7 @@ BEGIN
         END
         ), 0), 2)) AS "Total Debts",
     CONCAT('$ ', FORMAT(COALESCE(SUM(
-		CASE WHEN accounts.account_type = 'loan' THEN -1 * (number_shares * daily_value) 
+		CASE WHEN accounts.account_type = 'loan' THEN number_shares * daily_value
              ELSE number_shares * daily_value 
         END
         ), 0), 2)) AS "Net Worth"
