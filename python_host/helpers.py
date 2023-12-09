@@ -221,13 +221,17 @@ def get_valid_date() -> datetime.date:
 def get_yfinance(input_date: datetime.date) -> pd.DataFrame:
     """
     Get stock data for the S and P 100 in the form of a dataFrame.
+    Note - the stocks are hard-coded into this function. A future improvement would be to dynamically pull all
+    available stock data, and manage the day to day fluctuations of symbol names, which symbols are available to
+    trade, etc.
     :param input_date: a datetime.date object which is not a weekend
     :return: dataFrame object containing stock symbols, names, and values on the given date
     """
 
     # establish symbols and names of top 100 companies in S+P
     symbols = ["AAPL", "ABBV", "ABT", "ACN", "AIG", "ALL", "AMGN", "AMZN", "AXP", "BA", "BAC", "BIIB", "BK", "BLK",
-               "BMY", "C", "CAT", "CL", "CMCSA", "COF", "COP", "COST", "CSCO", "CVS", "CVX", "DD", "DHR", "DIS", "DOW",
+               "BMY", "C", "CAT", "CL", "CMCSA", "COF", "COP", "COST", "CSCO", "CVS", "CVX", "DD", "DHR", "DIS",
+               "DOW",
                "DUK", "EMC", "EMR", "EXC", "F", "META", "FDX", "FOX", "FOXA", "GD", "GE", "GILD", "GM", "GOOG", "GOOGL",
                "GS", "HAL", "HD", "HON", "IBM", "INTC", "JNJ", "JPM", "KMI", "KO", "LLY", "LMT", "LOW", "MA", "MCD",
                "MDLZ", "MDT", "MET", "MMM", "MO", "MRK", "MS", "MSFT", "NEE", "NKE", "ORCL", "OXY", "PEP", "PFE", "PG",
@@ -262,14 +266,33 @@ def get_yfinance(input_date: datetime.date) -> pd.DataFrame:
     input_date_string = input_date.strftime("%Y-%m-%d")
     input_date_plus_one_day_string = input_date_plus_one_day.strftime("%Y-%m-%d")
 
+    # Download the stock data for the given list of symbols
     yf_data = yf.download(
         symbols,
         start=input_date_string,
         end=input_date_plus_one_day_string)['Open']
 
+    failure_counter = 0
     # Populate the DataFrame
     for symbol in symbols:
-        sp_100.loc[sp_100['symbol'] == symbol, 'value'] = yf_data[symbol][0]
+        try:
+            sp_100.loc[sp_100['symbol'] == symbol, 'value'] = yf_data[symbol][0]
 
-    # Return the dataFrame
+        # If the key doesn't exist, set stock value to 0
+        # This would need to be improved in a future iteration of our project
+        except KeyError:
+            sp_100.loc[sp_100['symbol'] == symbol, 'value'] = 0
+            failure_counter += 1
+
+        except IndexError:
+            sp_100.loc[sp_100['symbol'] == symbol, 'value'] = 0
+            failure_counter += 1
+
+        except Exception as e:
+            failure_counter += 1
+
+    # If more than half of the symbols failed, then return -1
+    if failure_counter > 50:
+        return -1
+
     return sp_100

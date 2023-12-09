@@ -4,6 +4,8 @@ Purpose : this file contains the jsFinance class. This class represents an insta
           interact with jsFinance class run the file "run_jsfinance.py" or see README.md for more guidance.
 """
 
+import numpy
+
 """
 Pre-presentation priorities__________________________________________________________________________________________
 todo: yfinance implementation in jsFinance class. I'm thinking that we MANUALLY have people update this. 
@@ -32,6 +34,7 @@ import os
 # todo: delete troubleshooting and look at all todos
 global troubleshoot
 troubleshoot = False
+
 def print_troubleshoot(item_to_print: str):
     """
     Helper method to delete later. todo: delete.
@@ -305,7 +308,7 @@ class jsFinance:
             "category": "Modify"
         }
         self.command_dict["update all stocks"] = {
-            "command": self.update_my_family_to_null,
+            "command": self.update_all_stocks,
             "user": False,
             "Admin": True,
             "category": "Transact"
@@ -856,6 +859,49 @@ class jsFinance:
             print("Successfully added user to family.")
             self.automatic_family_update()
             print_troubleshoot(f"update_my_family(): new family is now {self.family}")
+
+    def update_all_stocks(self):
+        """
+        In admin mode, update all stocks daily value to a given date.
+        """
+
+        date_to_update = get_valid_date()
+
+        # If date_to_update returns None, cancel the operation
+        if not date_to_update:
+            print("Valid date was not entered, cancelling stock update.")
+            return
+
+        # Otherwise, execute the update
+        print("[            Downloading stock data              ]")
+        yfinance_df = get_yfinance(date_to_update)
+
+        # If the retrieval failed, the exit the function
+        if not isinstance(yfinance_df, pd.DataFrame):
+            if yfinance_df == -1:
+                print("Unable to download those stocks. Stock values in database have not changed. "
+                      "Try a different date.")
+                return
+
+        # Define the prompt
+        prompt = f"CALL update_stock_daily_value"
+
+        # Loop through yfinance_df and extract symbol and daily_value
+        for index, row in yfinance_df.iterrows():
+            # if the value IS a number then try to update the database
+            if not numpy.isnan(row['value']):
+                input_requirements = [
+                    {"user_input": None, "data": row['symbol'], "data_type": "string"},
+                    {"user_input": None, "data": round(row['value'], 2), "data_type": "number"}
+                ]
+
+                # Execute the database update operation
+                cursor_output = self.sql_helper(prompt, input_requirements)
+                result = self.parse_result("single number", cursor_output)
+
+                # Print failure to user
+                if result != 200:
+                    print(f'Error: unable to update stock price for symbol "{row["symbol"]}".')
 
     def take_out_loan(self):
         """
