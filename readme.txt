@@ -11,7 +11,7 @@ The host application runs in Python. Required libraries (See requirements.txt fo
 - pymysql
 - pandas
 - tabulate
-- Yfinance
+- yfinance
 
 To begin the program:
 No installation directory needs to be specified beyond proper installation of libraries.
@@ -22,3 +22,5 @@ specifically tailored and may not work within an IDE.
 The application begins in admin mode. The “select user” command enters into user mode,
  and “admin mode” cycles back to admin mode. “Help” is the most important command to 
 display the available list of commands given your current role.
+
+Note: see sample_workflow.txt for examples to get you started.
